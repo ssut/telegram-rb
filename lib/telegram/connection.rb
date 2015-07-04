@@ -4,37 +4,47 @@ module Telegram
       super
       @connected = false
       @on_connect = nil
+      @on_disconnect = nil
       @callback = nil
     end
 
     def communicate(*messages, &callback)
-      messages = messages.map { |m| escape(m) }.join
-      messages << "\n"
-
-      send_data(messages)
       @callback = callback
+      messages = messages.map { |m| escape(m) }.join << "\n"
+      send_data(messages)
     end
 
     def on_connect=(block)
       @on_connect = block
     end
 
-    def connected?
-      @connected
+    def on_disconnect=(block)
+      @on_disconnect = block
     end
 
     # @api private
     def connection_completed
       @connected = true
-      @on_connect.call
+      @on_connect.call unless @on_connect.nil?
+    end
+
+    def unbind
+      @connected = false
+      @on_disconnect.call unless @on_disconnect.nil?
+    end
+
+    def connected?
+      @connected
     end
 
     def receive_data(data)
+      p data
       begin
-        _receive_data(data)
+        result = _receive_data(data)
       rescue
-
+        result = nil
       end
+      @callback.call(!result.nil?, result) unless @callback.nil?
     end
 
     protected
@@ -44,8 +54,8 @@ module Telegram
         lflf = data.index("\n\n", lf) - 1
         data = data[lf..lflf]
         data = Oj.load(data)
-        p data
       end
+      data
     end
 
     def escape(str)
