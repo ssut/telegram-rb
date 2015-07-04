@@ -47,7 +47,16 @@ module Telegram
     def poll
       lpoll = Proc.new {
         if t = @stdout.readline then
-          p t
+          data = nil
+          begin
+            brace = t.index('{')
+            data = t[brace..-2]
+            data = Oj.load(data)
+          rescue
+          end
+          unless data.nil?
+            p data
+          end
           EM.next_tick(&lpoll)
         end
       }
