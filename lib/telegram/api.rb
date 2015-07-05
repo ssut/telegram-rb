@@ -31,6 +31,7 @@ module Telegram
           callback.trigger(:success)
           contact = TelegramContact.pick_or_new(self, data)
           @contacts << contact unless self.contacts.include?(contact)
+          @profile = contact
         else
           raise "Couldn't fetch the user profile."
         end
@@ -88,6 +89,10 @@ module Telegram
         end
       end
       callback
+    end
+
+    def msg(target, text, &callback)
+      @connection.communicate(['msg', target, text], &callback)
     end
 
     protected
