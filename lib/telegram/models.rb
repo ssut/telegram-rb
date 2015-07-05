@@ -8,7 +8,7 @@ module Telegram
       when 'encr_chat'
         "#{@title}"
       else
-        "#{@type}\##{@id}"
+        to_tg
       end
       @client.msg(target, text)
     end
@@ -55,8 +55,12 @@ module Telegram
       end
     end
 
-    def leave
+    def leave!
+      @client.chat_del_user(self, @client.profile)
+    end
 
+    def to_tg
+      "#{@type}\##{@id}"
     end
 
     def to_s
@@ -90,6 +94,10 @@ module Telegram
 
     def rooms
 
+    end
+
+    def to_tg
+      "#{@type}\##{@id}"
     end
 
     def to_s

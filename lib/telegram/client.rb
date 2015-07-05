@@ -30,9 +30,7 @@ module Telegram
       @connected = 0
       @stdout = nil
       @connect_callback = nil
-      @on = {
-        :message => nil
-      }
+      @on = {}
 
       @profile = nil
       @contacts = []
@@ -82,6 +80,7 @@ module Telegram
 
     def process_data
       process = Proc.new { |data|
+        begin
           type = case data['event']
           when 'message'
             if data['from']['id'] != @profile.id
@@ -99,13 +98,15 @@ module Telegram
             end : ActionType::NO_ACTION
 
           event = Event.new(self, type, action, data)
-          if type == EventType::RECEIVE_MESSAGE
-            p 'send'
-            event.tgmessage.reply(:text, ' 가 나 다 라 마 ')
-          end
-          @events.pop(&process)
-        }
+          @on[type].call(event) if @on.has_key?(type)
+        rescue Exception => e
+          p data
+          p e
+          p e.backtrace
+        end
         @events.pop(&process)
+      }
+      @events.pop(&process)
     end
 
     def connect(&block)

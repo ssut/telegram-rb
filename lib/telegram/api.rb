@@ -96,6 +96,15 @@ module Telegram
       @connection.communicate(['msg', target, text], &callback)
     end
 
+    def chat_add_user()
+
+    end
+
+    def chat_del_user(chat, user, &callback)
+      assert!
+      @connection.communicate(['chat_del_user', chat.to_tg, user.to_tg], &callback)
+    end
+
     protected
     def assert!
       raise "It appears that the connection to the telegram-cli is disconnected." unless connected?
