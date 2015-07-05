@@ -92,6 +92,7 @@ module Telegram
     end
 
     def msg(target, text, &callback)
+      assert!
       @connection.communicate(['msg', target, text], &callback)
     end
 
