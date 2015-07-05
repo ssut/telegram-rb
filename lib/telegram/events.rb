@@ -101,6 +101,11 @@ module Telegram
           user = TelegramContact.pick_or_new(@client, user)
           @client.contacts << user unless @client.contacts.include?(user)
           @message.to = user
+        elsif type == 'encr_chat'
+          chat = @raw_data['to']
+          chat = TelegramChat.pick_or_new(@client, chat)
+          @client.chats << chat unless @client.chats.include?(chat)
+          @message.to = chat
         end
       end
     end

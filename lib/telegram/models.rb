@@ -4,7 +4,12 @@ module Telegram
     attr_reader :id
 
     def send_message(text, refer)
-      target = "#{@type}\##{@id}"
+      target = case @type
+      when 'encr_chat'
+        "#{@title}"
+      else
+        "#{@type}\##{@id}"
+      end
       @client.msg(target, text)
     end
 
@@ -132,7 +137,7 @@ module Telegram
       @target = case @receiver.type
       when 'user'
         @sender
-      when 'chat'
+      when 'chat', 'encr_chat'
         @receiver
       end
     end
