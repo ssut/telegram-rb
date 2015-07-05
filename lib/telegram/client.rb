@@ -1,16 +1,18 @@
+# encoding: utf-8
 require 'eventmachine'
 require "em-synchrony"
 require 'em-synchrony/fiber_iterator'
 require 'ostruct'
 require 'oj'
-require 'open4'
 require 'shellwords'
+require 'date'
 
 require 'telegram/connection'
 require 'telegram/connection_pool'
 require 'telegram/callback'
 require 'telegram/api'
 require 'telegram/models'
+require 'telegram/events'
 
 module Telegram
   class Client < API
@@ -36,36 +38,41 @@ module Telegram
       @contacts = []
       @chats = []
       @starts_at = nil
+      @events = EM::Queue.new
     end
 
     def execute
       command = "'#{@config.daemon}' -Ck '#{@config.key}' -I -WS '#{@config.sock}' --json"
-      p command
-      pid, stdin, stdout, stderr = Open4.popen4(command)
-      stdout.flush
-      @stdout = stdout
+      @stdout = IO.popen(command)
+      p @stdout
       loop do
         if t = @stdout.readline then
           break if t.include?('I: config')
         end
       end
-      @stdout = stdout
       proc {}
     end
 
     def poll
       data = ''
-        
       loop do
-        IO.select([@stdout])
-        byte = @stdout.read_nonblock(2)
-        data << byte
+        begin
+          byte = @stdout.read_nonblock 1
+        rescue IO::WaitReadable
+          print 'wait readable.. '
+          IO.select([@stdout])
+          retry
+        rescue EOFError
+          p @pid
+          retry
+        end
+        data << byte unless @starts_at.nil?
         if byte.include?("\n")
           begin
             brace = data.index('{')
             data = data[brace..-2]
             data = Oj.load(data)
-
+            @events << data
           rescue
           end
           data = ''
@@ -73,9 +80,37 @@ module Telegram
       end
     end
 
+    def process_data
+      process = Proc.new { |data|
+          type = case data['event']
+          when 'message'
+            if data['from']['id'] != @profile.id
+              EventType::RECEIVE_MESSAGE
+            else
+              EventType::SEND_MESSAGE
+            end
+          end
+
+          action = data.has_key?('action') ? case data['action']
+            when 'chat_add_user'
+              ActionType::CHAT_ADD_USER
+            else
+              ActionType::UNKNOWN_ACTION
+            end : ActionType::NO_ACTION
+
+          event = Event.new(self, type, action, data)
+          if type == EventType::RECEIVE_MESSAGE
+            p 'send'
+            event.tgmessage.reply(:text, ' 가 나 다 라 마 ')
+          end
+          @events.pop(&process)
+        }
+        @events.pop(&process)
+    end
+
     def connect(&block)
-      @starts_at = Time.now
       @connect_callback = block
+      process_data
       EM.defer(execute, create_pool)
     end
 
