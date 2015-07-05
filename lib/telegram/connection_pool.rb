@@ -10,24 +10,24 @@ module Telegram
 
     def communicate(*messages, &block)
       begin
-        conn = acquire
-        conn.communicate(*messages, &block)
+        acquire do |conn|
+          conn.communicate(*messages, &block)
+        end
       rescue Exception => e
       end
 
     end
 
-    def acquire
-      conn = self.find { |conn| conn.available? }
-      if not conn.nil? and conn.connected?
-        return conn
-      else
-        EM.next_tick(&acquire)
-      end
-    end
-
-    def release
-
+    def acquire(&callback)
+      acq = Proc.new {
+        conn = self.find { |conn| conn.available? }
+        if not conn.nil? and conn.connected?
+          callback.call(conn)
+        else
+          EM.add_timer(0.1, &acq)
+        end
+      }
+      EM.add_timer(0, &acq)
     end
   end
 end
