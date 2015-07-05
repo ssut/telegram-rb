@@ -24,6 +24,12 @@ module Telegram
     attr_reader :name
     attr_reader :members
 
+    def self.pick_or_new(client, chat)
+      ct = client.chats.find { |c| c.id == chat['id'] }
+      return ct unless ct.nil?
+      TelegramChat.new(client, chat)
+    end
+
     def initialize(client, chat)
       @client = client
       @chat = chat
@@ -89,5 +95,8 @@ module Telegram
     def to_s
       "<TelegramContact #{@name}(#{@id}) username=#{@username}>"
     end
+  end
+
+  class TelegramMessage
   end
 end
