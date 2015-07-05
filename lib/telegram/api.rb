@@ -12,8 +12,9 @@ module Telegram
       end
 
       check_done = Proc.new {
-        if done and not cb.nil?
-          cb.call
+        if done
+          @starts_at = Time.now
+          cb.call unless cb.nil?
         else
           EM.next_tick(&check_done)
         end
