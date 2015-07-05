@@ -23,7 +23,7 @@ module Telegram
     attr_accessor :on
 
     def initialize(&b)
-      @config = OpenStruct.new(:daemon => 'bin/telegram', :key => 'tg-server.pub', :sock => 'tg.sock', :size => 3)
+      @config = OpenStruct.new(:daemon => 'bin/telegram', :key => 'tg-server.pub', :sock => 'tg.sock', :size => 5)
       yield @config
       @connected = 0
       @stdout = nil
@@ -35,12 +35,13 @@ module Telegram
       @profile = nil
       @contacts = []
       @chats = []
+      @starts_at = nil
     end
 
     def execute
-      command = "'#{@config.daemon}' -Ck '#{@config.key}' -WS '#{@config.sock}' --json -R"
+      command = "'#{@config.daemon}' -Ck '#{@config.key}' -I -WS '#{@config.sock}' --json"
+      p command
       pid, stdin, stdout, stderr = Open4.popen4(command)
-      stdout.sync = true
       stdout.flush
       @stdout = stdout
       loop do
@@ -73,6 +74,7 @@ module Telegram
     end
 
     def connect(&block)
+      @starts_at = Time.now
       @connect_callback = block
       EM.defer(execute, create_pool)
     end
