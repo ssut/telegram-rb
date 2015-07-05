@@ -1,11 +1,14 @@
 require 'eventmachine'
 require "em-synchrony"
+require 'em-synchrony/fiber_iterator'
 require 'ostruct'
 require 'oj'
 require 'open4'
 require 'shellwords'
 
 require 'telegram/connection'
+require 'telegram/connection_pool'
+require 'telegram/callback'
 require 'telegram/api'
 require 'telegram/models'
 
@@ -13,8 +16,9 @@ module Telegram
   class Client < API
     attr_reader :connection
 
+    attr_reader :profile
     attr_reader :contacts
-    attr_reader :rooms
+    attr_reader :chats
 
     attr_accessor :on
 
@@ -27,6 +31,10 @@ module Telegram
       @on = {
         :message => nil
       }
+
+      @profile = nil
+      @contacts = []
+      @chats = []
     end
 
     def execute
@@ -45,22 +53,23 @@ module Telegram
     end
 
     def poll
-      lpoll = Proc.new {
-        if t = @stdout.readline then
-          data = nil
+      data = ''
+        
+      loop do
+        IO.select([@stdout])
+        byte = @stdout.read_nonblock(2)
+        data << byte
+        if byte.include?("\n")
           begin
-            brace = t.index('{')
-            data = t[brace..-2]
+            brace = data.index('{')
+            data = data[brace..-2]
             data = Oj.load(data)
+
           rescue
           end
-          unless data.nil?
-            p data
-          end
-          EM.next_tick(&lpoll)
+          data = ''
         end
-      }
-      lpoll
+      end
     end
 
     def connect(&block)
@@ -69,7 +78,7 @@ module Telegram
     end
 
     def create_pool
-      @connection = EM::Synchrony::ConnectionPool.new(size: @config.size) do
+      @connection = ConnectionPool.new(@config.size) do
         client = EM.connect_unix_domain(@config.sock, Connection)
         client.on_connect = self.method(:on_connect)
         client.on_disconnect = self.method(:on_disconnect)
@@ -81,8 +90,8 @@ module Telegram
     def on_connect
       @connected += 1
       if connected?
-        EM.defer(poll)
-        @connect_callback.call unless @connect_callback.nil?
+        EM.defer(&method(:poll))
+        update!(&@connect_callback)
       end
     end
 
