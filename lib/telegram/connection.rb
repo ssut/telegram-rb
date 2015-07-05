@@ -10,7 +10,12 @@ module Telegram
 
     def communicate(*messages, &callback)
       @callback = callback
-      messages = messages.map { |m| escape(m) }.join << "\n"
+      messages = messages.each_with_index.map { |m, i|
+        if i > 0
+          m = "\"#{m}\""
+        end
+        m
+      }.join(' ') << "\n"
       send_data(messages)
     end
 
@@ -56,10 +61,6 @@ module Telegram
         data = Oj.load(data)
       end
       data
-    end
-
-    def escape(str)
-      str.gsub(' ', '_ ')
     end
   end
 end
