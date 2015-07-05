@@ -4,7 +4,6 @@ module Telegram
     SERVICE = 0
     MESSAGE = 1
     ONLINE_STATUS = 2
-
   end
 
   module ActionType
@@ -39,8 +38,11 @@ module Telegram
       @raw_data = data
       @time = nil
 
-      @time = Time.at(time.to_i) if time = data['date']
-      @time = DateTime.strptime(time, "%Y-%m-%d %H:%M:%S") if @time == nil and time = date['when']
+      @event = event
+      @action = action
+
+      @time = Time.at(data['date'].to_i) if data.has_key?('date')
+      @time = DateTime.strptime(data['when'], "%Y-%m-%d %H:%M:%S") if @time.nil? and date.has_key?('when')
 
       case event
       when EventType::SERVICE
@@ -94,6 +96,10 @@ module Telegram
           @message.to = user
         end
       end
+    end
+
+    def to_s
+      "<Event Type=#{@event} Action=#{@action} Time=#{@time} Message=#{@message}>"
     end
   end
 end
