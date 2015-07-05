@@ -96,8 +96,9 @@ module Telegram
       @connection.communicate(['msg', target, text], &callback)
     end
 
-    def chat_add_user()
-
+    def chat_add_user(chat, user, &callback)
+      assert!
+      @connection.communicate(['chat_add_user', chat.to_tg, user.to_tg], &callback)
     end
 
     def chat_del_user(chat, user, &callback)
