@@ -4,7 +4,8 @@ module Telegram
     attr_reader :id
 
     def send_message(text, refer)
-
+      target = "#{@type}\##{@id}"
+      @client.msg(target, text)
     end
 
     def send_sticker()
@@ -23,6 +24,7 @@ module Telegram
   class TelegramChat < TelegramBase
     attr_reader :name
     attr_reader :members
+    attr_reader :type
 
     def self.pick_or_new(client, chat)
       ct = client.chats.find { |c| c.id == chat['id'] }
@@ -48,10 +50,6 @@ module Telegram
       end
     end
 
-    def update
-
-    end
-
     def leave
 
     end
@@ -64,6 +62,7 @@ module Telegram
   class TelegramContact < TelegramBase
     attr_reader :name
     attr_reader :phone
+    attr_reader :type
 
     def self.pick_or_new(client, contact)
       ct = client.contacts.find { |c| c.id == contact['id'] }
@@ -88,15 +87,68 @@ module Telegram
 
     end
 
-    def update
-
-    end
-
     def to_s
       "<TelegramContact #{@name}(#{@id}) username=#{@username}>"
     end
   end
 
   class TelegramMessage
+    # @return [Telegram]
+    attr_reader :client
+
+    # @return [String]
+    attr_reader :raw
+
+    # @return [Integer]
+    attr_reader :id
+
+    # @return [Time]
+    attr_reader :time
+
+    # @return [TelegramContact] The user who sent this message
+    attr_reader :user
+
+    # targets to send a message
+    attr_reader :raw_target
+    attr_reader :target
+
+    # @return [TelegramChat]
+    attr_reader :chat
+
+    def initialize(client, event)
+      @event = event
+      
+      @id = event.id
+      @raw = event.message.text
+      @time = event.time
+      @content_type = event.message.type
+
+      @raw_sender = event.message.raw_from
+      @raw_receiver = event.message.raw_to
+
+      @user = @sender = event.message.from
+      @receiver = event.message.to
+
+      @target = case @receiver.type
+      when 'user'
+        @sender
+      when 'chat'
+        @receiver
+      end
+    end
+
+    def reply_user(type, content)
+
+    end
+
+    def reply(type, content, target=nil, &cb)
+      target = @target if target.nil?
+      if type == :text
+        target.send_message(content, self)
+      elsif type == :sticker 
+      elsif type == :image
+      end
+
+    end
   end
 end
