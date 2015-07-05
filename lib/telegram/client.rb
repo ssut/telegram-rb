@@ -38,7 +38,7 @@ module Telegram
     end
 
     def execute
-      command = "'#{@config.daemon}' -Ck '#{@config.key}' -WS '#{@config.sock}' --json"
+      command = "'#{@config.daemon}' -Ck '#{@config.key}' -WS '#{@config.sock}' --json -R"
       pid, stdin, stdout, stderr = Open4.popen4(command)
       stdout.sync = true
       stdout.flush
