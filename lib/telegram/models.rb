@@ -22,7 +22,6 @@ module Telegram
 
   class TelegramChat < TelegramBase
     attr_reader :name
-    attr_reader :phone
     attr_reader :members
 
     def initialize(client, chat)
@@ -34,9 +33,13 @@ module Telegram
       @type = chat['type']
 
       @members = []
-      chat['members'].each { |user|
-        @members << TelegramContact.new(client, user)
-      } if chat.has_key?('members')
+      if chat.has_key?('members')
+        chat['members'].each { |user|
+          @members << TelegramContact.pick_or_new(client, user)
+        }
+      elsif @type == 'user' and chat['user']
+        @members << TelegramContact.pick_or_new(client, chat)
+      end
     end
 
     def update
@@ -55,6 +58,12 @@ module Telegram
   class TelegramContact < TelegramBase
     attr_reader :name
     attr_reader :phone
+
+    def self.pick_or_new(client, contact)
+      ct = client.contacts.find { |c| c.id == contact['id'] }
+      return ct unless ct.nil?
+      TelegramContact.new(client, contact)
+    end
 
     def initialize(client, contact)
       @client = client
