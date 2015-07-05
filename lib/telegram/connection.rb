@@ -22,7 +22,6 @@ module Telegram
         end
         m
       }.join(' ') << "\n"
-      puts "self: #{self}, #{messages.inspect}"
       send_data(messages)
     end
 
@@ -50,7 +49,6 @@ module Telegram
     end
 
     def receive_data(data)
-      puts "self: #{self}, #{@callback}!"
       begin
         result = _receive_data(data)
       rescue

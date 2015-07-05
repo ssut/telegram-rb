@@ -92,8 +92,8 @@ module Telegram
       @client.contacts << self unless @client.contacts.include?(self)
     end
 
-    def rooms
-
+    def chats
+      @client.chats.select { |c| c.member.include?(self) }
     end
 
     def to_tg

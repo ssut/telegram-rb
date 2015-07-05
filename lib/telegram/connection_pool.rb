@@ -1,8 +1,10 @@
 module Telegram
   class ConnectionPool < Array
+    include Logging
+
     attr_reader :size
 
-    def initialize(size=5, &block)
+    def initialize(size=10, &block)
       size.times do 
         self << block.call if block_given?
       end
@@ -14,6 +16,7 @@ module Telegram
           conn.communicate(*messages, &block)
         end
       rescue Exception => e
+        logger.error("Error occurred during the communicating: #{e.inspect} #{e.backtrace}")
       end
 
     end
@@ -24,6 +27,7 @@ module Telegram
         if not conn.nil? and conn.connected?
           callback.call(conn)
         else
+          logger.warning("Failed to acquire available connection, retry after 0.1 second")
           EM.add_timer(0.1, &acq)
         end
       }

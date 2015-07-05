@@ -7,6 +7,7 @@ require 'oj'
 require 'shellwords'
 require 'date'
 
+require 'telegram/logger'
 require 'telegram/connection'
 require 'telegram/connection_pool'
 require 'telegram/callback'
@@ -16,6 +17,8 @@ require 'telegram/events'
 
 module Telegram
   class Client < API
+    include Logging
+
     attr_reader :connection
 
     attr_reader :profile
@@ -37,12 +40,13 @@ module Telegram
       @chats = []
       @starts_at = nil
       @events = EM::Queue.new
+
+      logger.info("Initialized")
     end
 
     def execute
       command = "'#{@config.daemon}' -Ck '#{@config.key}' -I -WS '#{@config.sock}' --json"
       @stdout = IO.popen(command)
-      p @stdout
       loop do
         if t = @stdout.readline then
           break if t.include?('I: config')
@@ -53,16 +57,16 @@ module Telegram
 
     def poll
       data = ''
+      logger.info("Start polling for events")
       loop do
         begin
           byte = @stdout.read_nonblock 1
         rescue IO::WaitReadable
-          print 'wait readable.. '
           IO.select([@stdout])
           retry
         rescue EOFError
-          p @pid
-          retry
+          logger.error("EOFError occurred during the polling")
+          return
         end
         data << byte unless @starts_at.nil?
         if byte.include?("\n")
@@ -100,9 +104,7 @@ module Telegram
           event = Event.new(self, type, action, data)
           @on[type].call(event) if @on.has_key?(type)
         rescue Exception => e
-          p data
-          p e
-          p e.backtrace
+          logger.error("Error occurred during the processing: #{data}\n #{e.inspect} #{e.backtrace}")
         end
         @events.pop(&process)
       }
@@ -110,6 +112,7 @@ module Telegram
     end
 
     def connect(&block)
+      logger.info("Trying to start telegram-cli and then connect")
       @connect_callback = block
       process_data
       EM.defer(execute, create_pool)
@@ -128,6 +131,7 @@ module Telegram
     def on_connect
       @connected += 1
       if connected?
+        logger.info("Successfully connected to the Telegram CLI")
         EM.defer(&method(:poll))
         update!(&@connect_callback)
       end

@@ -15,6 +15,7 @@ module Telegram
         if done
           @starts_at = Time.now
           cb.call unless cb.nil?
+          logger.info("Successfully loaded all information")
         else
           EM.next_tick(&check_done)
         end
