@@ -33,3 +33,10 @@ build/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+
+# OS X
+.DS_Store
+
+# Telegram
+telegram-cli
+tg-server.pub
