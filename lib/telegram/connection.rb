@@ -1,14 +1,20 @@
 module Telegram
-  class Connection < EventMachine::Connection
+  class Connection < EM::Connection
     def initialize
       super
       @connected = false
       @on_connect = nil
       @on_disconnect = nil
       @callback = nil
+      @available = true
+    end
+
+    def available?
+      @available
     end
 
     def communicate(*messages, &callback)
+      @available = false
       @callback = callback
       messages = messages.each_with_index.map { |m, i|
         if i > 0
@@ -16,6 +22,7 @@ module Telegram
         end
         m
       }.join(' ') << "\n"
+      puts "self: #{self}, #{messages.inspect}"
       send_data(messages)
     end
 
@@ -43,13 +50,15 @@ module Telegram
     end
 
     def receive_data(data)
-      p data
+      puts "self: #{self}, #{@callback}!"
       begin
         result = _receive_data(data)
       rescue
         result = nil
       end
       @callback.call(!result.nil?, result) unless @callback.nil?
+      @callback = nil
+      @available = true
     end
 
     protected
