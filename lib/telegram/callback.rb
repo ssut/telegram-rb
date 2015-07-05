@@ -1,8 +1,11 @@
 module Telegram
   class Callback
+    attr_reader :data
+
     def initialize
       @success = nil
       @fail = nil
+      @data = nil
     end
 
     def callback(&cb)
@@ -13,7 +16,8 @@ module Telegram
       @fail = cb
     end
 
-    def trigger(type = :success)
+    def trigger(type = :success, data = nil)
+      @data = data
       case type
       when :success
         @success.call
