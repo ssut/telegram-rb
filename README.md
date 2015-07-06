@@ -97,6 +97,7 @@ My goal is to have the code fully documentated for the project, so developers ca
     - [x] Send typing signal to specific user or chat
     - [x] Send a message to specific user or chat 
     - [x] Send an image to specific user or chat
+    - [x] Send a video to specific user or chat
     - [ ] Download an image of someone sent
     - [ ] Forward a message to specific user
     - [ ] Mark as read all received messages

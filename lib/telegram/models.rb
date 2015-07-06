@@ -66,9 +66,7 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.1]
     def send_image(path, refer, &callback)
-      p File.exists?(path)
       callback.call(false, {}) if not File.exist?(path) and not callback.nil?
-      p File.exists?(path)
       @client.send_photo(targetize, path, &callback)
     end
 
@@ -103,6 +101,17 @@ module Telegram
         logger.error("An error occurred during the image downloading: #{e.inspect} #{e.backtrace}")
         on_fail.call
       end
+    end
+
+    # Send a video
+    #
+    # @param [String] path The absoulte path of the video you want to send
+    # @param [TelegramMessage] refer referral of the method call
+    # @param [Block] callback Callback block that will be called when finished
+    # @since [0.1.1]
+    def send_video(path, refer, &callback)
+      callback.call(false, {}) if not File.exist?(path) and not callback.nil?
+      @client.send_video(targetize, path, &callback)
     end
   end
 
@@ -310,12 +319,15 @@ module Telegram
     # @since [0.1.0]
     def reply(type, content, target=nil, &callback)
       target = @target if target.nil?
-      if type == :text
+
+      case type
+      when :text
         target.send_message(content, self, &callback)
-      elsif type == :sticker 
-      elsif type == :image
+      when :image
         method = content.include?('http') ? target.method(:send_image_url) : target.method(:send_image)
         method.call(content, self, &callback)
+      when :video
+        target.send_video(content, self, &callback)
       end
     end
   end
