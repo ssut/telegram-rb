@@ -5,11 +5,37 @@ module Telegram
   # @see TelegramRoom
   # @since [0.1.0]
   class TelegramBase
+    include Logging
+
     # @return [Client] Root client instance
     attr_reader :client
 
     # @return [Integer] Identifier
     attr_reader :id
+
+    # Send typing signal
+    #
+    # @since [0.1.0]
+    def send_typing
+      target = @type == 'encr_chat' ? @title : to_tg
+      if @type == 'encr_chat'
+        logger.warning("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
+        return
+      end
+      @client.send_typing(target)
+    end
+
+    # Abort sending typing signal
+    #
+    # @since [0.1.0]
+    def send_typing_abort
+      target = @type == 'encr_chat' ? @title : to_tg
+      if @type == 'encr_chat'
+        logger.warning("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
+        return
+      end
+      @client.send_typing_abort(target)
+    end
 
     # Send a message with given text
     #
@@ -17,12 +43,7 @@ module Telegram
     # @param [TelegramMessage] refer referrer of the method call
     # @since [0.1.0]
     def send_message(text, refer)
-      target = case @type
-      when 'encr_chat'
-        "#{@title}"
-      else
-        to_tg
-      end
+      target = @type == 'encr_chat' ? @title : to_tg
       @client.msg(target, text)
     end
 
