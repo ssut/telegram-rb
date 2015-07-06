@@ -46,25 +46,40 @@ module Telegram
   # Message object belong to {Event} class instance
   #
   # @see Event
-  # @!attribute text
-  #   @return [String] The text of the message
-  # @!attribute type
-  #   @return [String] The type of the message (either of text, photo, video or etc)
-  # @!attribute from
-  #   @return [TelegramContact] The sender of the message
-  # @!attribute from_type
-  #   @return [String] The type of the sender
-  # @!attribute raw_from
-  #   @return [String] Raw identifier string of the sender
-  # @!attribute to
-  #   @return [TelegramChat] If you receive a message in the chat group
-  #   @return [TelegramContact] If you receive a message in the chat with one contact
-  # @!attribute to_type
-  #   @return [String] The type of the receiver
-  # @!attribute raw_to
-  #   @return [String] Raw identifier string of the receiver
   # @since [0.1.0]
   class Message < Struct.new(:text, :type, :from, :from_type, :raw_from, :to, :to_type, :raw_to)
+    # @!attribute text
+    #   @return [String] The text of the message
+    attr_accessor :text
+
+    # @!attribute type
+    #   @return [String] The type of the message (either of text, photo, video or etc)
+    attr_accessor :type
+
+    # @!attribute from
+    #   @return [TelegramContact] The sender of the message
+    attr_accessor :from
+
+    # @!attribute from_type
+    #   @return [String] The type of the sender
+    attr_accessor :from_type
+
+    # @!attribute raw_from
+    #   @return [String] Raw identifier string of the sender
+    attr_accessor :raw_from
+
+    # @!attribute to
+    #   @return [TelegramChat] If you receive a message in the chat group
+    #   @return [TelegramContact] If you receive a message in the chat with one contact
+    attr_accessor :to
+
+    # @!attribute to_type
+    #   @return [String] The type of the receiver
+    attr_accessor :to_type
+
+    # @!attribute raw_to
+    #   @return [String] Raw identifier string of the receiver
+    attr_accessor :raw_to
   end
 
   # Event object, will be created in the process part of {Client}
