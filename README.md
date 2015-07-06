@@ -96,26 +96,26 @@ end
     - [ ] Forward a message to specific user
     - [ ] Mark as read all received messages
     - [ ] Set profile picture
-- Group chat options
+- [ ] Group chat options
     - [x] Add a user to the group
     - [x] Remove a user from the group
     - [x] Leave from the group
     - [ ] Create a new group chat
     - [ ] Set group chat photo
     - [ ] Rename group chat title
-- Search
+- [ ] Search
     - [ ] Search for specific message from a conversation
     - [ ] Search for specific message from all conversions
-- Secret chat
+- [ ] Secret chat
     - [x] Reply message in secret chat
     - [ ] Visualize of encryption key of the secret chat
     - [ ] Create a new secret chat
-- Stats and various info
+- [ ] Stats and various info
     - [x] Get user profile
     - [x] Get chat list
     - [x] Get contact list
     - [ ] Get history and mark it as read
-- Card
+- [ ] Card
     - [ ] export card
     - [ ] import card
 
