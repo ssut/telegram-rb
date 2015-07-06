@@ -13,30 +13,35 @@ module Telegram
     # @return [Integer] Identifier
     attr_reader :id
 
+    # Convert to telegram-cli target format from {TelegramChat} or {TelegramContact}
+    #
+    # @since [0.1.1]
+    def targetize
+      @type == 'encr_chat' ? @title : to_tg
+    end
+
     # Send typing signal
     #
     # @param [Block] callback Callback block that will be called when finished
-    # @since [0.1.0]
+    # @since [0.1.1]
     def send_typing(&callback)
-      target = @type == 'encr_chat' ? @title : to_tg
       if @type == 'encr_chat'
         logger.warn("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
         return
       end
-      @client.send_typing(target)
+      @client.send_typing(targetize)
     end
 
     # Abort sending typing signal
     #
     # @param [Block] callback Callback block that will be called when finished
-    # @since [0.1.0]
+    # @since [0.1.1]
     def send_typing_abort(&callback)
-      target = @type == 'encr_chat' ? @title : to_tg
       if @type == 'encr_chat'
         logger.warn("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
         return
       end
-      @client.send_typing_abort(target, &callback)
+      @client.send_typing_abort(targetize, &callback)
     end
 
     # Send a message with given text
@@ -46,8 +51,7 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.0]
     def send_message(text, refer, &callback)
-      target = @type == 'encr_chat' ? @title : to_tg
-      @client.msg(target, text, &callback)
+      @client.msg(targetize, text, &callback)
     end
 
     # @abstract Send a sticker
@@ -60,8 +64,12 @@ module Telegram
     # @param [String] path The absoulte path of the image you want to send
     # @param [TelegramMessage] refer referral of the method call
     # @param [Block] callback Callback block that will be called when finished
+    # @since [0.1.1]
     def send_image(path, refer, &callback)
-
+      p File.exists?(path)
+      callback.call(false, {}) if not File.exist?(path) and not callback.nil?
+      p File.exists?(path)
+      @client.send_photo(targetize, path, &callback)
     end
 
     # @abstract Send an image with given url, not implemen
@@ -69,8 +77,32 @@ module Telegram
     # @param [String] url The URL of the image you want to send
     # @param [TelegramMessage] refer referral of the method call
     # @param [Block] callback Callback block that will be called when finished
+    # @since [0.1.1]
     def send_image_url(url, refer, &callback)
+      on_fail = Proc.new {
+        callback.call(false, {}) unless callback.nil?
+      }
 
+      begin
+        http = EM::HttpRequest.new(url, :connect_timeout => 2, :inactivity_timeout => 5).get
+        file = Tempfile.new(['image', 'jpg'])
+        http.stream { |chunk|
+          file.write(chunk)
+        }
+        http.callback {
+          file.close
+          type = FastImage.type(file.path)
+          if %i(jpeg png gif).include?(type)
+            p file.path
+            send_image(file.path, refer, &callback)
+          else
+            on_fail.call
+          end
+        }
+      rescue Exception => e
+        logger.error("An error occurred during the image downloading: #{e.inspect} #{e.backtrace}")
+        on_fail.call
+      end
     end
   end
 
@@ -282,6 +314,8 @@ module Telegram
         target.send_message(content, self, &callback)
       elsif type == :sticker 
       elsif type == :image
+        method = content.include?('http') ? target.method(:send_image_url) : target.method(:send_image)
+        method.call(content, self, &callback)
       end
     end
   end

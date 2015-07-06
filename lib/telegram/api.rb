@@ -169,7 +169,7 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @yieldparam [Bool] success The result of the request (true or false)
     # @yieldparam [Hash] data The raw data of the request
-    # @since [0.1.0]
+    # @since [0.1.1]
     # @example
     #   telegram.send_typing('chat#1234567') do |success, data|
     #     puts success # => true
@@ -186,7 +186,7 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @yieldparam [Bool] success The result of the request (true or false)
     # @yieldparam [Hash] data The raw data of the request
-    # @since [0.1.0]
+    # @since [0.1.1]
     # @example
     #   telegram.send_typing_abort('chat#1234567') do |success, data|
     #     puts success # => true
@@ -195,6 +195,25 @@ module Telegram
     def send_typing_abort(chat, &callback)
       assert!
       @connection.communicate(['send_typing_abort', chat], &callback)
+    end
+
+    # Send a photo to the chat
+    #
+    # @param [String] chat Target chat group to send a photo
+    # @param [String] path The path of the image you want to send
+    # @param [Block] callback Callback block that will be called when finished
+    # @yieldparam [Bool] success The result of the request (true or false)
+    # @yieldparam [Hash] data The raw data of the request
+    # @since [0.1.1]
+    # @example
+    #   telegram.send_photo('chat#1234567') do |success, data|
+    #     puts "there was a problem during the sending" unless success
+    #     puts success # => true
+    #     puts data # => {"event": "message", "media": {"type": "photo", ...}, ...}
+    #   end
+    def send_photo(chat, path, &callback)
+      assert!
+      @connection.communicate(['send_photo', chat, path], &callback)
     end
 
     protected
