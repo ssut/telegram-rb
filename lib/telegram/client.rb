@@ -16,17 +16,33 @@ require 'telegram/models'
 require 'telegram/events'
 
 module Telegram
+  # @version 0.1.0
   class Client < API
     include Logging
 
+    # @return [ConnectionPool] Socket connection pool, includes {Connection}
+    # @since [0.1.0]
     attr_reader :connection
 
+    # @return [TelegramContact] Current user's profile
+    # @since [0.1.0]
     attr_reader :profile
+
+    # @return [Array<TelegramContact>] Current user's contact list
+    # @since [0.1.0]
     attr_reader :contacts
+
+    # @return [Array<TelegramChat>] Chats that current user joined
+    # @since [0.1.0]
     attr_reader :chats
 
+    # Event listeners that can respond to the event arrives
+    #
+    # @see EventType
+    # @since [0.1.0]
     attr_accessor :on
 
+    # @yield [config] Given configuration struct to the block
     def initialize(&b)
       @config = OpenStruct.new(:daemon => 'bin/telegram', :key => 'tg-server.pub', :sock => 'tg.sock', :size => 5)
       yield @config
@@ -44,6 +60,9 @@ module Telegram
       logger.info("Initialized")
     end
 
+    # Execute telegram-cli daemon and wait for the respond
+    #
+    # @api private
     def execute
       command = "'#{@config.daemon}' -Ck '#{@config.key}' -I -WS '#{@config.sock}' --json"
       @stdout = IO.popen(command)
@@ -55,6 +74,9 @@ module Telegram
       proc {}
     end
 
+    # Do the long-polling from stdout of the telegram-cli
+    #
+    # @api private
     def poll
       data = ''
       logger.info("Start polling for events")
@@ -82,6 +104,9 @@ module Telegram
       end
     end
 
+    # Process given data to make {Event} instance
+    #
+    # @api private
     def process_data
       process = Proc.new { |data|
         begin
@@ -111,6 +136,9 @@ module Telegram
       @events.pop(&process)
     end
 
+    # Start telegram-cli daemon
+    # 
+    # @yield This block will be executed when all connections have responded
     def connect(&block)
       logger.info("Trying to start telegram-cli and then connect")
       @connect_callback = block
@@ -118,6 +146,9 @@ module Telegram
       EM.defer(execute, create_pool)
     end
 
+    # Create a connection pool based on the {Connection} and given configuration
+    #
+    # @api private
     def create_pool
       @connection = ConnectionPool.new(@config.size) do
         client = EM.connect_unix_domain(@config.sock, Connection)
@@ -128,6 +159,9 @@ module Telegram
       proc {}
     end
 
+    # A event listener that will be called if the {Connection} successes on either of {ConnectionPool}
+    #
+    # @api private
     def on_connect
       @connected += 1
       if connected?
@@ -137,10 +171,15 @@ module Telegram
       end
     end
 
+    # A event listener that will be called if the {Connection} closes on either of {ConnectionPool}
+    #
+    # @api private
     def on_disconnect
       @connected -= 1
     end
 
+    # @return [bool] Connection pool status
+    # @since [0.1.0]
     def connected?
       @connected == @config.size
     end
