@@ -1,9 +1,10 @@
 # Telegram API for Ruby!
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ssut/telegram-rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
 [![Gem Version](https://badge.fury.io/rb/telegram-rb.svg)](http://badge.fury.io/rb/telegram-rb)
 [![Code Climate](https://codeclimate.com/github/ssut/telegram-rb/badges/gpa.svg)](https://codeclimate.com/github/ssut/telegram-rb)
+[![Inline docs](http://inch-ci.org/github/ssut/telegram-rb.svg?branch=master)](http://inch-ci.org/github/ssut/telegram-rb)
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ssut/telegram-rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 A Ruby wrapper that communicates with the [Telegram-CLI](https://github.com/vysheng/tg).
 
