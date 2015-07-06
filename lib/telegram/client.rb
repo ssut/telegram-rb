@@ -42,8 +42,11 @@ module Telegram
     # @since [0.1.0]
     attr_accessor :on
 
+    # Initialize Telegram Client
+    #
+    # @yieldparam [Block] block 
     # @yield [config] Given configuration struct to the block
-    def initialize(&b)
+    def initialize(&block)
       @config = OpenStruct.new(:daemon => 'bin/telegram', :key => 'tg-server.pub', :sock => 'tg.sock', :size => 5)
       yield @config
       @connected = 0

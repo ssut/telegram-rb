@@ -3,6 +3,7 @@ module Telegram
   #
   # @note Don't make a connection directly to the telegram-cli
   # @see Client
+  # @see ConnectionPool
   # @version 0.1.0
   class Connection < EM::Connection
     # Initialize connection
