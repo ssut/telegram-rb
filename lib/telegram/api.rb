@@ -134,7 +134,7 @@ module Telegram
     # @yieldparam [Hash] data The data of the request
     # @since [0.1.0]
     # @example
-    #   telegram.msg('chat#1234567', 'user#1234567') do |success, data|
+    #   telegram.chat_add_user('chat#1234567', 'user#1234567') do |success, data|
     #     puts success # => true
     #     puts data # => {"event": "service", ...}
     #   end
@@ -152,7 +152,7 @@ module Telegram
     # @yieldparam [Hash] data The data of the request
     # @since [0.1.0]
     # @example
-    #   telegram.msg('chat#1234567', 'user#1234567') do |success, data|
+    #   telegram.chat_del_user('chat#1234567', 'user#1234567') do |success, data|
     #     puts success # => true
     #     puts data # => {"event": "service", ...}
     #   end
