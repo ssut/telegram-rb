@@ -59,7 +59,7 @@ module Telegram
 
     end
 
-    # @abstract Send an image
+    # Send an image
     #
     # @param [String] path The absoulte path of the image you want to send
     # @param [TelegramMessage] refer referral of the method call
@@ -72,7 +72,7 @@ module Telegram
       @client.send_photo(targetize, path, &callback)
     end
 
-    # @abstract Send an image with given url, not implemen
+    # Send an image with given url, not implemen
     #
     # @param [String] url The URL of the image you want to send
     # @param [TelegramMessage] refer referral of the method call
