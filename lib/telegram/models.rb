@@ -118,6 +118,10 @@ module Telegram
     end
   end
 
+  # Telegram Contact Model
+  #
+  # @see TelegramBase
+  # @since [0.1.0]
   class TelegramContact < TelegramBase
     # @return [String] The name of the contact
     attr_reader :name
@@ -176,6 +180,10 @@ module Telegram
     end
   end
 
+  # Telegram Message Model
+  #
+  # @see Event
+  # @since [0.1.0]
   class TelegramMessage
     # @return [Client] Root client instance
     attr_reader :client
