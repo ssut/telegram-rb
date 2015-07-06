@@ -1,41 +1,84 @@
 module Telegram
+  # Define Event Types
+  #
+  # @see Event
+  # @since [0.1.0]
   module EventType
+    # Unknown Event
+    # @since [0.1.0]
     UNKNOWN_EVENT = -1
+    # Service
+    # @since [0.1.0]
     SERVICE = 0
+    # Receive Message
+    # @since [0.1.0]
     RECEIVE_MESSAGE = 1
+    # Send Message
+    # @since [0.1.0]
     SEND_MESSAGE = 2
+    # Online Status Changes
+    # @since [0.1.0]
     ONLINE_STATUS = 3
   end
 
+  # Define Action Types
+  #
+  # @see Event
+  # @since [0.1.0]
   module ActionType
+    # Unknown Action
+    # @since [0.1.0]
     UNKNOWN_ACTION = -1
+    # No Action
+    # @since [0.1.0]
     NO_ACTION = 0
+    # Adde a user to the chat
+    # @since [0.1.0]
     CHAT_ADD_USER = 1
+    # Remove a user from the chat
+    # @since [0.1.0]
     CHAT_DEL_USER = 2
+    # Rename title of the chat
+    # @since [0.1.0]
     CHAT_RENAME = 3
   end
 
+  # Message object belong to {Event} class instance
+  #
+  # @see Event
+  # @since [0.1.0]
   class Message < Struct.new(:text, :type, :from, :from_type, :raw_from, :to, :to_type, :raw_to); end
 
+  # Event object, will be created in the process part of {Client}
+  #
+  # @see Client
+  # @since [0.1.0]
   class Event
-    # @return [Number]
+    # @return [Number] Event identifier
     attr_reader :id
 
-    # @return [EventType]
+    # @return [EventType] Event type, created from given data
     attr_reader :event
 
-    # @return [ActionType]
+    # @return [ActionType] Action type, created from given data
     attr_reader :action
 
-    # @return [Time]
+    # @return [Time] Time event received
     attr_reader :time
 
-    # @return [Message]
+    # @return [Message] Message object, created from given data
     attr_reader :message
 
-    # @return [TelegramMessage]
+    # @return [TelegramMessage] Telegram message object, created from {Message}
     attr_reader :tgmessage
 
+    # Create a new {Event} instance
+    #
+    # @param [Client] client Root client instance
+    # @param [EventType] event Event type
+    # @param [ActionType] action Action type
+    # @param [Hash] data Raw data
+    # @since [0.1.0]
     def initialize(client, event = EventType::UNKNOWN_EVENT, action = ActionType::NO_ACTION, data = {})
       @client = client
       @message = nil
@@ -60,10 +103,18 @@ module Telegram
       end
     end
 
+    # Process raw data in which event type is service given.
+    #
+    # @return [void]
+    # @api private
     def format_service
 
     end
 
+    # Process raw data in which event type is message given.
+    #
+    # @return [void]
+    # @api private
     def format_message
       message = Message.new
       message.text = @raw_data['text']
@@ -110,6 +161,9 @@ module Telegram
       end
     end
 
+    # Convert {Event} instance to the string format
+    #
+    # @return [String]
     def to_s
       "<Event Type=#{@event} Action=#{@action} Time=#{@time} Message=#{@message}>"
     end
