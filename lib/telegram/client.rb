@@ -2,10 +2,13 @@
 require 'eventmachine'
 require "em-synchrony"
 require 'em-synchrony/fiber_iterator'
+require 'em-http-request'
 require 'ostruct'
 require 'oj'
 require 'shellwords'
 require 'date'
+require 'tempfile'
+require 'fastimage'
 
 require 'telegram/logger'
 require 'telegram/connection'
@@ -19,7 +22,7 @@ module Telegram
   # Telegram Client
   #
   # @see API
-  # @version 0.1.0
+  # @version 0.1.1
   class Client < API
     include Logging
 

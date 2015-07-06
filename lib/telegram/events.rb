@@ -150,7 +150,7 @@ module Telegram
     # @api private
     def format_message
       message = Message.new
-      message.text = @raw_data['text']
+      message.text = @raw_data.has_key?('text') ? @raw_data['text'] : ''
       message.type = @raw_data.has_key?('media') ? @raw_data['media']['type'] : 'text'
       message.raw_from = @raw_data['from']['id']
       message.from_type = @raw_data['from']['type']
