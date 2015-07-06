@@ -128,8 +128,8 @@ module Telegram
 
     # Add a user to the chat group
     #
-    # @param [TelegramChat] chat Target chat group to add a user
-    # @param [TelegramContact] user User who would be added
+    # @param [String] chat Target chat group to add a user
+    # @param [String] user User who would be added
     # @param [Block] callback Callback block that will be called when finished
     # @yieldparam [Bool] success The result of the request (true or false)
     # @yieldparam [Hash] data The raw data of the request
@@ -141,14 +141,14 @@ module Telegram
     #   end
     def chat_add_user(chat, user, &callback)
       assert!
-      @connection.communicate(['chat_add_user', chat.to_tg, user.to_tg], &callback)
+      @connection.communicate(['chat_add_user', chat, user], &callback)
     end
 
     # Remove a user from the chat group
     # You can leave a group by this method (Set a user identifier to your identifier)
     #
-    # @param [TelegramChat] chat Target chat group to remove a user
-    # @param [TelegramContact] user User who would be removed from the chat
+    # @param [String] chat Target chat group to remove a user
+    # @param [String] user User who would be removed from the chat
     # @param [Block] callback Callback block that will be called when finished
     # @yieldparam [Bool] success The result of the request (true or false)
     # @yieldparam [Hash] data The raw data of the request
@@ -160,12 +160,12 @@ module Telegram
     #   end
     def chat_del_user(chat, user, &callback)
       assert!
-      @connection.communicate(['chat_del_user', chat.to_tg, user.to_tg], &callback)
+      @connection.communicate(['chat_del_user', chat, user], &callback)
     end
 
     # Send typing signal to the chat
     #
-    # @param [TelegramChat] chat Target chat group to send typing signal
+    # @param [String] chat Target chat group to send typing signal
     # @param [Block] callback Callback block that will be called when finished
     # @yieldparam [Bool] success The result of the request (true or false)
     # @yieldparam [Hash] data The raw data of the request
@@ -177,12 +177,12 @@ module Telegram
     #   end
     def send_typing(chat, &callback)
       assert!
-      @connection.communicate(['send_typing', chat.to_tg], &callback)
+      @connection.communicate(['send_typing', chat], &callback)
     end
 
     # Abort sendign typing signal
     #
-    # @param [TelegramChat] chat Target chat group to stop sending typing signal
+    # @param [String] chat Target chat group to stop sending typing signal
     # @param [Block] callback Callback block that will be called when finished
     # @yieldparam [Bool] success The result of the request (true or false)
     # @yieldparam [Hash] data The raw data of the request
@@ -194,7 +194,7 @@ module Telegram
     #   end
     def send_typing_abort(chat, &callback)
       assert!
-      @connection.communicate(['send_typing_abort', chat.to_tg], &callback)
+      @connection.communicate(['send_typing_abort', chat], &callback)
     end
 
     protected

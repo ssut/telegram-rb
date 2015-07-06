@@ -15,11 +15,12 @@ module Telegram
 
     # Send typing signal
     #
+    # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.0]
-    def send_typing
+    def send_typing(&callback)
       target = @type == 'encr_chat' ? @title : to_tg
       if @type == 'encr_chat'
-        logger.warning("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
+        logger.warn("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
         return
       end
       @client.send_typing(target)
@@ -27,24 +28,26 @@ module Telegram
 
     # Abort sending typing signal
     #
+    # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.0]
-    def send_typing_abort
+    def send_typing_abort(&callback)
       target = @type == 'encr_chat' ? @title : to_tg
       if @type == 'encr_chat'
-        logger.warning("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
+        logger.warn("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
         return
       end
-      @client.send_typing_abort(target)
+      @client.send_typing_abort(target, &callback)
     end
 
     # Send a message with given text
     #
     # @param [String] text text you want to send for
     # @param [TelegramMessage] refer referrer of the method call
+    # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.0]
-    def send_message(text, refer)
+    def send_message(text, refer, &callback)
       target = @type == 'encr_chat' ? @title : to_tg
-      @client.msg(target, text)
+      @client.msg(target, text, &callback)
     end
 
     # @abstract Send a sticker
@@ -123,7 +126,7 @@ module Telegram
     #
     # @since [0.1.0]
     def leave!
-      @client.chat_del_user(self, @client.profile)
+      @client.chat_del_user(self, @client.profile.to_tg)
     end
 
     # @return [String] A chat identifier formatted with type
@@ -260,7 +263,8 @@ module Telegram
     #
     # @param [Symbol] type Type of the message (either of :text, :sticker, :image)
     # @param [String] content Content to send a message
-    def reply_user(type, content)
+    # @param [Block] callback Callback block that will be called when finished
+    def reply_user(type, content, &callback)
 
     end
 
@@ -268,11 +272,14 @@ module Telegram
     #
     # @param [Symbol] type Type of the message (either of :text, :sticker, :image)
     # @param [String] content Content to send a message
+    # @param [TelegramChat] target Specify a TelegramChat to send
+    # @param [TelegramContact] target Specify a TelegramContact to send
+    # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.0]
-    def reply(type, content, target=nil, &cb)
+    def reply(type, content, target=nil, &callback)
       target = @target if target.nil?
       if type == :text
-        target.send_message(content, self)
+        target.send_message(content, self, &callback)
       elsif type == :sticker 
       elsif type == :image
       end
