@@ -1,5 +1,6 @@
 # Telegram API for Ruby!
 
+[![DUB](https://img.shields.io/dub/l/vibe-d.svg)](http://opensource.org/licenses/MIT)
 [![Gem Version](https://badge.fury.io/rb/telegram-rb.svg)](http://badge.fury.io/rb/telegram-rb)
 [![Code Climate](https://codeclimate.com/github/ssut/telegram-rb/badges/gpa.svg)](https://codeclimate.com/github/ssut/telegram-rb)
 [![Inline docs](http://inch-ci.org/github/ssut/telegram-rb.svg?branch=master)](http://inch-ci.org/github/ssut/telegram-rb)
@@ -86,7 +87,9 @@ end
 
 ### Documentation
 
-(TBA with Ruby-doc)
+**You can check documentation from [here](http://www.rubydoc.info/github/ssut/telegram-rb)!**
+
+My goal is to have the code fully documentated for the project, so developers can use this library easily!
 
 ## Coverage (TODO)
 
