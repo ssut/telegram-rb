@@ -16,6 +16,9 @@ require 'telegram/models'
 require 'telegram/events'
 
 module Telegram
+  # Telegram Client
+  #
+  # @see API
   # @version 0.1.0
   class Client < API
     include Logging
