@@ -1,5 +1,13 @@
 module Telegram
+  # Telegram API Implementation
+  # 
+  # @note You must avoid doing direct calls or initializes
+  # @see Client
+  # @version 0.1.0
   class API
+    # Update user profile, contacts and chats
+    #
+    # @api private
     def update!(&cb)
       done = false
       EM.synchrony do
@@ -23,6 +31,9 @@ module Telegram
       EM.add_timer(0, &check_done)
     end
 
+    # Update user profile
+    #
+    # @api private
     def update_profile!
       assert!
       callback = Callback.new
@@ -40,6 +51,9 @@ module Telegram
       callback
     end
 
+    # Update user contacts
+    #
+    # @api private
     def update_contacts!
       assert!
       callback = Callback.new
@@ -58,6 +72,9 @@ module Telegram
       callback
     end
 
+    # Update user chats
+    #
+    # @api private
     def update_chats!
       assert!
       callback = Callback.new
@@ -92,22 +109,62 @@ module Telegram
       callback
     end
 
+    # Send a message to specific user or chat
+    #
+    # @param [String] target Target to send a message
+    # @param [String] text Message content to be sent
+    # @yieldparam [Bool] success The result of the request (true or false)
+    # @yieldparam [Hash] data The data of the request
+    # @since [0.1.0]
+    # @example
+    #   telegram.msg('user#1234567', 'hello!') do |success, data|
+    #     puts success # => true
+    #     puts data # => {"event": "message", "out": true, ...}
+    #   end
     def msg(target, text, &callback)
       assert!
       @connection.communicate(['msg', target, text], &callback)
     end
 
+    # Add a user to the chat group
+    #
+    # @param [String] chat Target chat group to add a user
+    # @param [String] user User identifier to be added
+    # @yieldparam [Bool] success The result of the request (true or false)
+    # @yieldparam [Hash] data The data of the request
+    # @since [0.1.0]
+    # @example
+    #   telegram.msg('chat#1234567', 'user#1234567') do |success, data|
+    #     puts success # => true
+    #     puts data # => {"event": "service", ...}
+    #   end
     def chat_add_user(chat, user, &callback)
       assert!
       @connection.communicate(['chat_add_user', chat.to_tg, user.to_tg], &callback)
     end
 
+    # Remove a user to the chat group
+    # You can leave a group by this method (Set a user identifier to your identifier)
+    #
+    # @param [String] chat Target chat group to remove a user
+    # @param [String] user User identifier to be removed
+    # @yieldparam [Bool] success The result of the request (true or false)
+    # @yieldparam [Hash] data The data of the request
+    # @since [0.1.0]
+    # @example
+    #   telegram.msg('chat#1234567', 'user#1234567') do |success, data|
+    #     puts success # => true
+    #     puts data # => {"event": "service", ...}
+    #   end
     def chat_del_user(chat, user, &callback)
       assert!
       @connection.communicate(['chat_del_user', chat.to_tg, user.to_tg], &callback)
     end
 
     protected
+    # Check the availability of the telegram-cli daemon
+    # @since [0.1.0]
+    # @api private
     def assert!
       raise "It appears that the connection to the telegram-cli is disconnected." unless connected?
     end
