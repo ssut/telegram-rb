@@ -20,6 +20,14 @@ module Telegram
       @type == 'encr_chat' ? @title : to_tg
     end
 
+    # Execute a callback block with failure result
+    #
+    # @since [0.1.1]
+    # @api private
+    def fail_back(&callback)
+      callback.call(false, {}) unless callback.nil?
+    end
+
     # Send typing signal
     #
     # @param [Block] callback Callback block that will be called when finished
@@ -66,7 +74,7 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.1]
     def send_image(path, refer, &callback)
-      callback.call(false, {}) if not File.exist?(path) and not callback.nil?
+      fail_back(&callback) if not File.exist?(path)
       @client.send_photo(targetize, path, &callback)
     end
 
@@ -77,10 +85,6 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.1]
     def send_image_url(url, refer, &callback)
-      on_fail = Proc.new {
-        callback.call(false, {}) unless callback.nil?
-      }
-
       begin
         http = EM::HttpRequest.new(url, :connect_timeout => 2, :inactivity_timeout => 5).get
         file = Tempfile.new(['image', 'jpg'])
@@ -91,15 +95,14 @@ module Telegram
           file.close
           type = FastImage.type(file.path)
           if %i(jpeg png gif).include?(type)
-            p file.path
             send_image(file.path, refer, &callback)
           else
-            on_fail.call
+            fail_back(&callback)
           end
         }
       rescue Exception => e
         logger.error("An error occurred during the image downloading: #{e.inspect} #{e.backtrace}")
-        on_fail.call
+        fail_back(&callback)
       end
     end
 
@@ -110,7 +113,7 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.1]
     def send_video(path, refer, &callback)
-      callback.call(false, {}) if not File.exist?(path) and not callback.nil?
+      fail_back(&callback) if not File.exist?(path)
       @client.send_video(targetize, path, &callback)
     end
   end
@@ -135,9 +138,7 @@ module Telegram
     # @param [Integer] chat Raw chat data
     # @since [0.1.0]
     def self.pick_or_new(client, chat)
-      ct = client.chats.find { |c| c.id == chat['id'] }
-      return ct unless ct.nil?
-      TelegramChat.new(client, chat)
+      client.chats.find { |chat| chat.id == chat['id'] } or TelegramChat.new(client, chat)
     end
 
     # Create a new chat instance
@@ -203,9 +204,7 @@ module Telegram
     # @param [Integer] contact Raw contact data
     # @since [0.1.0]
     def self.pick_or_new(client, contact)
-      ct = client.contacts.find { |c| c.id == contact['id'] }
-      return ct unless ct.nil?
-      TelegramContact.new(client, contact)
+      client.contacts.find { |contact| contact.id == contact['id'] } or TelegramContact.new(client, contact)
     end
 
     # Create a new contact instance
