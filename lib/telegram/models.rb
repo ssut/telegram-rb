@@ -163,7 +163,7 @@ module Telegram
       @chat = chat
 
       @id = chat['id']
-      @title = chat.has_key?('title') ? chat['title'] : chat['print_name']
+      @name = @title = chat.has_key?('title') ? chat['title'] : chat['print_name']
       @type = chat['type']
 
       @members = []
