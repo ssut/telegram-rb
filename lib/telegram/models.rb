@@ -54,7 +54,7 @@ module Telegram
         logger.warn("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
         return
       end
-      @client.send_typing(targetize)
+      @client.send_typing(targetize, &callback)
     end
 
     # Abort sending typing signal
