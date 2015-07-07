@@ -46,7 +46,7 @@ module Telegram
         if not conn.nil? and conn.connected?
           callback.call(conn)
         else
-          logger.warning("Failed to acquire available connection, retry after 0.1 second")
+          logger.warn("Failed to acquire available connection, retry after 0.1 second")
           EM.add_timer(0.1, &acq)
         end
       }
