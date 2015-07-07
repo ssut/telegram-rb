@@ -9,6 +9,7 @@ require 'shellwords'
 require 'date'
 require 'tempfile'
 require 'fastimage'
+require 'active_support/core_ext/object/try'
 
 require 'telegram/logger'
 require 'telegram/connection'
