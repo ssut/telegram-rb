@@ -13,6 +13,23 @@ module Telegram
     # @return [Integer] Identifier
     attr_reader :id
 
+    # Return an instance if exists, or else create a new instance and return
+    #
+    # @param [Client] client Root client instance
+    # @param [Integer] raw Raw data on either of telegram objects
+    # @since [0.1.0]
+    def self.pick_or_new(client, raw)
+      # where to search for
+      where = if self == TelegramChat
+        client.chats
+      elsif self == TelegramContact
+        client.contacts
+      end
+
+      # pick a first item if exists, or else create
+      where.find { |obj| obj.id == raw['id'] } or self.new(client, raw)
+    end
+
     # Convert to telegram-cli target format from {TelegramChat} or {TelegramContact}
     #
     # @since [0.1.1]
@@ -136,15 +153,6 @@ module Telegram
     # @return [String] The type of the chat (chat, encr_chat, user and etc)
     attr_reader :type
 
-    # Return an instance if exists, or else create a new instance and return
-    #
-    # @param [Client] client Root client instance
-    # @param [Integer] chat Raw chat data
-    # @since [0.1.0]
-    def self.pick_or_new(client, raw)
-      client.chats.find { |chat| chat.id == raw['id'] } or TelegramChat.new(client, raw)
-    end
-
     # Create a new chat instance
     #
     # @param [Client] client Root client instance
@@ -201,15 +209,6 @@ module Telegram
 
     # @return [String] The type of the contact # => "user"
     attr_reader :type
-
-    # Return an instance if exists, or else create a new instance and return
-    #
-    # @param [Client] client Root client instance
-    # @param [Integer] raw Raw contact data
-    # @since [0.1.0]
-    def self.pick_or_new(client, raw)
-      client.contacts.find { |contact| contact.id == raw['id'] } or TelegramContact.new(client, raw)
-    end
 
     # Create a new contact instance
     #
