@@ -74,6 +74,10 @@ module Telegram
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.1]
     def send_image(path, refer, &callback)
+      if @type == 'encr_chat'
+        logger.warn("Currently telegram-cli has a bug with send_typing, then prevent this for safety")
+        return
+      end
       fail_back(&callback) if not File.exist?(path)
       @client.send_photo(targetize, path, &callback)
     end
@@ -137,8 +141,8 @@ module Telegram
     # @param [Client] client Root client instance
     # @param [Integer] chat Raw chat data
     # @since [0.1.0]
-    def self.pick_or_new(client, chat)
-      client.chats.find { |chat| chat.id == chat['id'] } or TelegramChat.new(client, chat)
+    def self.pick_or_new(client, raw)
+      client.chats.find { |chat| chat.id == raw['id'] } or TelegramChat.new(client, raw)
     end
 
     # Create a new chat instance
@@ -201,10 +205,10 @@ module Telegram
     # Return an instance if exists, or else create a new instance and return
     #
     # @param [Client] client Root client instance
-    # @param [Integer] contact Raw contact data
+    # @param [Integer] raw Raw contact data
     # @since [0.1.0]
-    def self.pick_or_new(client, contact)
-      client.contacts.find { |contact| contact.id == contact['id'] } or TelegramContact.new(client, contact)
+    def self.pick_or_new(client, raw)
+      client.contacts.find { |contact| contact.id == raw['id'] } or TelegramContact.new(client, raw)
     end
 
     # Create a new contact instance

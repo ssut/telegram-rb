@@ -150,8 +150,9 @@ module Telegram
     # @api private
     def format_message
       message = Message.new
-      message.text = @raw_data.has_key?('text') ? @raw_data['text'] : ''
-      message.type = @raw_data.has_key?('media') ? @raw_data['media']['type'] : 'text'
+
+      message.text = @raw_data['text'] or ''
+      message.type = @raw_data['media'].try(:[], 'type') or 'text'
       message.raw_from = @raw_data['from']['id']
       message.from_type = @raw_data['from']['type']
       message.raw_to = @raw_data['to']['id']
@@ -175,21 +176,19 @@ module Telegram
 
       if @message.to.nil?
         type = @raw_data['to']['type']
-        if type == 'chat'
-          chat = @raw_data['to']
-          chat = TelegramChat.pick_or_new(@client, chat)
+        case type
+        when 'chat', 'encr_chat'
+          chat = TelegramChat.pick_or_new(@client, @raw_data['to'])
           @client.chats << chat unless @client.chats.include?(chat)
-          @message.from = chat
-        elsif type == 'user'
-          user = @raw_data['to']
-          user = TelegramContact.pick_or_new(@client, user)
+          if type == 'encr_chat' then
+            @message.to = chat
+          else
+            @message.from = chat 
+          end
+        when 'user'
+          user = TelegramContact.pick_or_new(@client, @raw_data['to'])
           @client.contacts << user unless @client.contacts.include?(user)
           @message.to = user
-        elsif type == 'encr_chat'
-          chat = @raw_data['to']
-          chat = TelegramChat.pick_or_new(@client, chat)
-          @client.chats << chat unless @client.chats.include?(chat)
-          @message.to = chat
         end
       end
     end
