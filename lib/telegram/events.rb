@@ -151,8 +151,8 @@ module Telegram
     def format_message
       message = Message.new
 
-      message.text = @raw_data['text'] or ''
-      message.type = @raw_data['media'].try(:[], 'type') or 'text'
+      message.text = @raw_data['text'] ||= ''
+      message.type = @raw_data['media'].try(:[], 'type') || 'text'
       message.raw_from = @raw_data['from']['id']
       message.from_type = @raw_data['from']['type']
       message.raw_to = @raw_data['to']['id']
