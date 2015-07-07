@@ -78,30 +78,30 @@ module Telegram
     def update_chats!
       assert!
       callback = Callback.new
+      
       collected = 0
-
-      collect_done = Proc.new { |id, data, count|
+      collect_done = Proc.new do |id, data, count|
         collected += 1
         @chats << TelegramChat.new(self, data)
         callback.trigger(:success) if collected == count
-      }
-      collect = Proc.new { |id, count|
+      end
+      collect = Proc.new do |id, count|
         @connection.communicate(['chat_info', "chat\##{id}"]) do |success, data|
           collect_done.call(id, data, count) if success
         end
-      }
+      end
 
       @chats = []
       @connection.communicate('dialog_list') do |success, data|
         if success and data.class == Array
           chatsize = data.count { |chat| chat['type'] == 'chat' }
-          data.each { |chat|
+          data.each do |chat|
             if chat['type'] == 'chat'
               collect.call(chat['id'], chatsize)
             elsif chat['type'] == 'user'
               @chats << TelegramChat.new(self, chat)
             end
-          }
+          end
         else
           raise "Couldn't fetch the dialog(chat) list."
         end
