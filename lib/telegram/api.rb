@@ -235,6 +235,20 @@ module Telegram
       @connection.communicate(['send_video', chat, path], &callback)
     end
 
+    # Download an attachment from a message
+    #
+    # @param [type] type The type of an attachment (:photo, :video, :audio)
+    # @param [String] seq Message sequence number
+    # @param [Block] callback Callback block that will be called when finished
+    # @yieldparam [Bool] success The result of the request (true or false)
+    # @yieldparam [Hash] data The raw data of the request
+    # @since [0.1.1]
+    def download_attachment(type, seq, &callback)
+      assert!
+      raise "Type mismatch" unless %w(photo video audio).include?(type)
+      @connection.communicate(["load_#{type.to_s}", seq], &callback)
+    end
+
     protected
     # Check the availability of the telegram-cli daemon
     #
