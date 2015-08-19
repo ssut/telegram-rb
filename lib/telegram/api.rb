@@ -102,6 +102,7 @@ module Telegram
               @chats << TelegramChat.new(self, chat)
             end
           end
+          callback.trigger(:success) if chatsize == 0
         else
           raise "Couldn't fetch the dialog(chat) list."
         end
