@@ -204,6 +204,9 @@ module Telegram
     # @return [String] The name of the contact
     attr_reader :name
 
+    # @return [String] The username of the contact
+    attr_reader :username
+
     # @return [Array<TelegramContact>] The phone number of the contact
     attr_reader :phone
 
@@ -331,6 +334,13 @@ module Telegram
       when :video
         target.send_video(content, self, &callback)
       end
+    end
+
+    # Convert {TelegramMessage} instance to the string format
+    #
+    # @return [String]
+    def to_s
+      "<TelegramMessage id=#{@id} raw=#{@raw} time=#{@time} user=#{@user} target=#{@target} raw_target=#{@raw_target}>"
     end
   end
 end
