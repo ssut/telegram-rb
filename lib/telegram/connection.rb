@@ -30,12 +30,8 @@ module Telegram
     def communicate(*messages, &callback)
       @available = false
       @callback = callback
-      messages = messages.each_with_index.map { |m, i|
-        if i > 0
-          m = "\"#{m}\""
-        end
-        m
-      }.join(' ') << "\n"
+      messages = messages.first if messages.size == 1 and messages.first.is_a?(Array)
+      messages = messages.join(' ') << "\n"
       send_data(messages)
     end
 
