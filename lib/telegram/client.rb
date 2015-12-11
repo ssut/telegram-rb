@@ -11,6 +11,8 @@ require 'tempfile'
 require 'fastimage'
 require 'active_support/core_ext/object/try'
 
+require 'ext/string'
+
 require 'telegram/logger'
 require 'telegram/connection'
 require 'telegram/connection_pool'

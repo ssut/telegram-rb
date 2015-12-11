@@ -124,7 +124,7 @@ module Telegram
     #   end
     def msg(target, text, &callback)
       assert!
-      @connection.communicate(['msg', target, text], &callback)
+      @connection.communicate(['msg', target, text.escape!], &callback)
     end
 
     # Add a user to the chat group
