@@ -197,7 +197,7 @@ module Telegram
     #
     # @return [String]
     def to_s
-      "<Event Type=#{@event} Action=#{@action} Time=#{@time} Message=#{@message}>"
+      "<Event Type=#{@event} Action=#{@action} Time=#{@time} Message=#{@tgmessage}>"
     end
   end
 end
