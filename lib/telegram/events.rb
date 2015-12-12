@@ -47,7 +47,11 @@ module Telegram
   #
   # @see Event
   # @since [0.1.0]
-  class Message < Struct.new(:text, :type, :from, :from_type, :raw_from, :to, :to_type, :raw_to)
+  class Message < Struct.new(:id, :text, :type, :from, :from_type, :raw_from, :to, :to_type, :raw_to)
+    # @!attribute id
+    #   @return [Number] Message Identifier
+    attr_accessor :id
+
     # @!attribute text
     #   @return [String] The text of the message
     attr_accessor :text
@@ -114,6 +118,7 @@ module Telegram
     # @since [0.1.0]
     def initialize(client, event = EventType::UNKNOWN_EVENT, action = ActionType::NO_ACTION, data = {})
       @client = client
+      @id = data.try(:[], 'id') || ''
       @message = nil
       @tgmessage = nil
       @raw_data = data
@@ -151,12 +156,13 @@ module Telegram
     def format_message
       message = Message.new
 
+      message.id = @id
       message.text = @raw_data['text'] ||= ''
       message.type = @raw_data['media'].try(:[], 'type') || 'text'
-      message.raw_from = @raw_data['from']['id']
-      message.from_type = @raw_data['from']['type']
-      message.raw_to = @raw_data['to']['id']
-      message.to_type = @raw_data['to']['type']
+      message.raw_from = @raw_data['from']['peer_id']
+      message.from_type = @raw_data['from']['peer_type']
+      message.raw_to = @raw_data['to']['peer_id']
+      message.to_type = @raw_data['to']['peer_type']
 
       from = @client.contacts.find { |c| c.id == message.raw_from }
       to = @client.contacts.find { |c| c.id == message.raw_to }
@@ -175,7 +181,7 @@ module Telegram
       end
 
       if @message.to.nil?
-        type = @raw_data['to']['type']
+        type = @raw_data['to']['peer_type']
         case type
         when 'chat', 'encr_chat'
           chat = TelegramChat.pick_or_new(@client, @raw_data['to'])

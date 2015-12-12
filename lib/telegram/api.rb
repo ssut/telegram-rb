@@ -94,11 +94,11 @@ module Telegram
       @chats = []
       @connection.communicate('dialog_list') do |success, data|
         if success and data.class == Array
-          chatsize = data.count { |chat| chat['type'] == 'chat' }
+          chatsize = data.count { |chat| chat['peer_type'] == 'chat' }
           data.each do |chat|
-            if chat['type'] == 'chat'
-              collect.call(chat['id'], chatsize)
-            elsif chat['type'] == 'user'
+            if chat['peer_type'] == 'chat'
+              collect.call(chat['peer_id'], chatsize)
+            elsif chat['peer_type'] == 'user'
               @chats << TelegramChat.new(self, chat)
             end
           end

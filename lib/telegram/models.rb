@@ -27,7 +27,7 @@ module Telegram
       end
 
       # pick a first item if exists, or else create
-      where.find { |obj| obj.id == raw['id'] } or self.new(client, raw)
+      where.find { |obj| obj.id == raw['peer_id'] } or self.new(client, raw)
     end
 
     # Convert to telegram-cli target format from {TelegramChat} or {TelegramContact}
@@ -162,9 +162,9 @@ module Telegram
       @client = client
       @chat = chat
 
-      @id = chat['id']
+      @id = chat['peer_id']
       @name = @title = chat.has_key?('title') ? chat['title'] : chat['print_name']
-      @type = chat['type']
+      @type = chat['peer_type']
 
       @members = []
       if chat.has_key?('members')
@@ -222,7 +222,7 @@ module Telegram
       @client = client
       @contact = contact
 
-      @id = contact['id']
+      @id = contact['peer_id']
       @type = 'user'
       @username = contact.has_key?('username') ? contact['username'] : ''
       @name = contact['print_name']
@@ -272,6 +272,9 @@ module Telegram
 
     # @return [String] 
     attr_reader :raw_target
+
+    # @return [String] Content type
+    attr_reader :content_type
 
     # @return [TelegramChat] if you were talking in a chat group
     # @return [TelegramContact] if you were talking with contact
