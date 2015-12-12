@@ -105,9 +105,10 @@ module Telegram
     # @param [TelegramMessage] refer referral of the method call
     # @param [Block] callback Callback block that will be called when finished
     # @since [0.1.1]
-    def send_image_url(url, refer, &callback)
+    def send_image_url(url, opt, refer, &callback)
       begin
-        http = EM::HttpRequest.new(url, :connect_timeout => 2, :inactivity_timeout => 5).get
+        opt = {} if opt.nil?
+        http = EM::HttpRequest.new(url, :connect_timeout => 2, :inactivity_timeout => 5).get opt
         file = Tempfile.new(['image', 'jpg'])
         http.stream { |chunk|
           file.write(chunk)
@@ -332,11 +333,27 @@ module Telegram
       when :text
         target.send_message(content, self, &callback)
       when :image
-        method = content.include?('http') ? target.method(:send_image_url) : target.method(:send_image)
-        method.call(content, self, &callback)
+        option = nil
+        content, option = content if content.class == Array
+        if content.include?('http')
+          target.method(:send_image_url).call(content, option, self, &callback)
+        else
+          target.method(:send_image).call(content, self, &callback)
+        end
       when :video
         target.send_video(content, self, &callback)
       end
+    end
+
+    def members
+      contact_list = []
+      if @target.class == TelegramContact
+        contact_list << @target
+      else
+        contact_list = @target.members
+      end
+
+      contact_list
     end
 
     # Convert {TelegramMessage} instance to the string format
