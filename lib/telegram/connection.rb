@@ -16,6 +16,7 @@ module Telegram
       @on_disconnect = nil
       @callback = nil
       @available = true
+      @data = ''
     end
 
     # @return [Bool] the availiability of current connection 
@@ -29,6 +30,7 @@ module Telegram
     # @yieldparam [Block] callback Callback block that will be called when finished
     def communicate(*messages, &callback)
       @available = false
+      @data = ''
       @callback = callback
       messages = messages.first if messages.size == 1 and messages.first.is_a?(Array)
       messages = messages.join(' ') << "\n"
@@ -76,9 +78,13 @@ module Telegram
     #
     # @api private
     def receive_data(data)
+      @data << data
+
+      return unless data.index("\n\n")
       begin
-        result = _receive_data(data)
+        result = _receive_data(@data)
       rescue
+        raise
         result = nil
       end
       @callback.call(!result.nil?, result) unless @callback.nil?
