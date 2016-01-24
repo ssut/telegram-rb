@@ -101,7 +101,7 @@ module Telegram
         lf = data.index("\n") + 1
         lflf = data.index("\n\n", lf) - 1
         data = data[lf..lflf]
-        data = Oj.load(data)
+        data = Oj.load(data, :mode => :compat)
       end
       data
     end

@@ -107,7 +107,7 @@ module Telegram
           begin
             brace = data.index('{')
             data = data[brace..-2]
-            data = Oj.load(data)
+            data = Oj.load(data, mode: :compat)
             @events << data
           rescue
           end
@@ -124,7 +124,7 @@ module Telegram
         begin
           type = case data['event']
           when 'message'
-            if data['from']['id'] != @profile.id
+            if data['from']['peer_id'] != @profile.id
               EventType::RECEIVE_MESSAGE
             else
               EventType::SEND_MESSAGE
