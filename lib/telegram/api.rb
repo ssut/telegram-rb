@@ -235,6 +235,13 @@ module Telegram
       assert!
       @connection.communicate(['send_video', chat, path], &callback)
     end
+    
+    # Closes the telegram CLI app (used in case of app shutdown to kill the child process)
+    #
+    def quit(&callback)
+      assert!
+      @connection.communicate(['quit'], &callback)
+    end
 
     # Download an attachment from a message
     #
