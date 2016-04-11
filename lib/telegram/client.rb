@@ -44,6 +44,8 @@ module Telegram
     # @return [Array<TelegramChat>] Chats that current user joined
     # @since [0.1.0]
     attr_reader :chats
+    
+    attr_reader :stdout
 
     # Event listeners that can respond to the event arrives
     #
