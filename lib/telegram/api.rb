@@ -238,7 +238,7 @@ module Telegram
     
     # Closes the telegram CLI app (used in case of app shutdown to kill the child process)
     #
-    def quit(&callback)
+    def disconnect(&callback)
       assert!
       @connection.communicate(['quit'], &callback)
     end
