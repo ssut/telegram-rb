@@ -136,6 +136,8 @@ module Telegram
           action = data.has_key?('action') ? case data['action']
             when 'chat_add_user'
               ActionType::CHAT_ADD_USER
+            when 'create_group_chat'
+              ActionType::CREATE_GROUP_CHAT
             else
               ActionType::UNKNOWN_ACTION
             end : ActionType::NO_ACTION
