@@ -41,3 +41,4 @@ build/
 # Telegram
 telegram-cli
 tg-server.pub
+.idea/
