@@ -238,7 +238,7 @@ module Telegram
 
     def create_group_chat(chat_topic, users, &callback)
       assert!
-      @connection.communicate(['create_group_chat', chat_topic, users], &callback)
+      @connection.communicate(['create_group_chat', chat_topic.escape!, users], &callback)
     end
     # Closes the telegram CLI app (used in case of app shutdown to kill the child process)
     #
