@@ -44,6 +44,8 @@ module Telegram
     # Create group chat
     # @since [0.1.0]
     CREATE_GROUP_CHAT = 4
+
+    ADD_CONTACT = 5
   end
 
   # Message object belong to {Event} class instance

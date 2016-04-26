@@ -138,6 +138,8 @@ module Telegram
               ActionType::CHAT_ADD_USER
             when 'create_group_chat'
               ActionType::CREATE_GROUP_CHAT
+             when 'add_contact'
+               ActionType::ADD_CONTACT
             else
               ActionType::UNKNOWN_ACTION
             end : ActionType::NO_ACTION
