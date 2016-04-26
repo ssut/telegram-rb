@@ -236,9 +236,10 @@ module Telegram
       @connection.communicate(['send_video', chat, path], &callback)
     end
 
-    def create_group_chat(chat_topic, users, &callback)
+    def create_group_chat(chat_topic, *users, &callback)
       assert!
-      @connection.communicate(['create_group_chat', chat_topic.escape!, users], &callback)
+      members = users.join(" ")
+      @connection.communicate(['create_group_chat', chat_topic.escape!, members], &callback)
     end
     # Closes the telegram CLI app (used in case of app shutdown to kill the child process)
     #
