@@ -106,7 +106,7 @@ My goal is to have the code fully documentated for the project, so developers ca
     - [x] Add a user to the group
     - [x] Remove a user from the group
     - [x] Leave from the group
-    - [ ] Create a new group chat
+    - [x] Create a new group chat
     - [ ] Set group chat photo
     - [ ] Rename group chat title
 - [ ] Search

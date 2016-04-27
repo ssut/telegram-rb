@@ -41,6 +41,9 @@ module Telegram
     # Rename title of the chat
     # @since [0.1.0]
     CHAT_RENAME = 3
+    # Create group chat
+    # @since [0.1.0]
+    CREATE_GROUP_CHAT = 4
   end
 
   # Message object belong to {Event} class instance
