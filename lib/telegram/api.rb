@@ -241,6 +241,11 @@ module Telegram
       members = users.join(" ")
       @connection.communicate(['create_group_chat', chat_topic.escape!, members], &callback)
     end
+
+    def add_contact(phone_number, first_name, last_name, &callback)
+      assert!
+      @connection.communicate(['add_contact', phone_number, first_name.escape!, last_name.escape!], &callback)
+    end
     # Closes the telegram CLI app (used in case of app shutdown to kill the child process)
     #
     def disconnect(&callback)
