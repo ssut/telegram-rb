@@ -14,4 +14,15 @@ Gem::Specification.new do |s|
   s.email       = 'ssut@ssut.me'
   s.files       = `git ls-files`.split("\n")
   s.homepage    = 'https://github.com/ssut/telegram-rb'
+
+  s.add_dependency('eventmachine')
+  s.add_dependency('em-synchrony')
+  s.add_dependency('em-http-request')
+  s.add_dependency('activesupport')
+  s.add_dependency('fastimage')
+  s.add_dependency('oj')
+
+  s.add_development_dependency('rubysl-irb')
+  s.add_development_dependency('yard')
+  s.add_development_dependency('ruby-prof')
 end
