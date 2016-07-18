@@ -14,7 +14,6 @@ A Ruby wrapper that communicates with the [Telegram-CLI](https://github.com/vysh
 ### Requirements
 
 * You need to install the [Telegram-CLI](https://github.com/vysheng/tg) first.
-* [EventMachine](https://github.com/eventmachine/eventmachine) is required for telegram-rb.
 
 ### RubyGems
 
@@ -28,29 +27,25 @@ or in your `Gemfile`:
 
 ```ruby
 # latest stable
-gem 'telegram-rb'
+gem 'telegram-rb', require: 'telegram'
 
 # or track master repo
-gem 'telegram-rb', :github => 'ssut/telegram-rb'
-```
-
-or install it from a source code checkout:
-
-```bash
-$ git clone https://github.com/ssut/telegram-rb.git
-$ cd telegram-rb
-$ bundle install
+gem 'telegram-rb', github: 'ssut/telegram-rb', require: 'telegram'
 ```
 
 ## Usage
 
-You must use eventmachine library for use, so telegram-rb uses callback at all.
+The library uses EventMachine, so the logic is wrapped in `EM.run`.
 
 ```ruby
-require 'eventmachine'
-require 'telegram'
+# When using Bundler, let it load all libraries
+require 'bundler' 
+Bundler.require(:default) 
 
-EM.run
+# Otherwise, require 'telegram', which will load its dependencies
+# require 'telegram'
+
+EM.run do
   telegram = Telegram::Client.new do |cfg|
     cfg.daemon = '/path/to/tg/bin/telegram-cli'
     cfg.key = '/path/to/tg/tg-server.pub'
@@ -72,17 +67,17 @@ EM.run
     
     # Event listeners
     # When you've received a message:
-    telegram.on[Telegram::EventType::RECEIVE_MESSAGE] = Proc.new { |event|
+    telegram.on[Telegram::EventType::RECEIVE_MESSAGE] = Proc.new do |event|
       # `tgmessage` is TelegramMessage instance
       puts event.tgmessage
-    }
+    end 
+
     # When you've sent a message:
-    telegram.on[Telegram::EventType::SEND_MESSAGE]= Proc.new { |event|
+    telegram.on[Telegram::EventType::SEND_MESSAGE] = Proc.new do |event|
       puts event
-    }
+    end
   end
 end
-
 ```
 
 ### Documentation
