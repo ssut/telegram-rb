@@ -54,6 +54,7 @@ EM.run
   telegram = Telegram::Client.new do |cfg|
     cfg.daemon = '/path/to/tg/bin/telegram-cli'
     cfg.key = '/path/to/tg/tg-server.pub'
+    cfg.profile = 'user2' # optional, the profiles must be configured in ~/.telegram-cli/config
   end
 
   telegram.connect do

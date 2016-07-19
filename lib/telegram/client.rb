@@ -13,6 +13,8 @@ require 'active_support/core_ext/object/try'
 
 require 'ext/string'
 
+require 'telegram/config'
+require 'telegram/cli_arguments'
 require 'telegram/logger'
 require 'telegram/connection'
 require 'telegram/connection_pool'
@@ -44,7 +46,7 @@ module Telegram
     # @return [Array<TelegramChat>] Chats that current user joined
     # @since [0.1.0]
     attr_reader :chats
-    
+
     attr_reader :stdout
 
     # Event listeners that can respond to the event arrives
@@ -55,10 +57,10 @@ module Telegram
 
     # Initialize Telegram Client
     #
-    # @yieldparam [Block] block 
+    # @yieldparam [Block] block
     # @yield [config] Given configuration struct to the block
     def initialize(&block)
-      @config = OpenStruct.new(:daemon => 'bin/telegram', :key => 'tg-server.pub', :sock => 'tg.sock', :size => 5)
+      @config = Telegram::Config.new
       yield @config
       @connected = 0
       @stdout = nil
@@ -74,11 +76,12 @@ module Telegram
       logger.info("Initialized")
     end
 
-    # Execute telegram-cli daemon and wait for the respond
+    # Execute telegram-cli daemon and wait for the response
     #
     # @api private
     def execute
-      command = "'#{@config.daemon}' -Ck '#{@config.key}' -I -WS '#{@config.sock}' --json"
+      cli_arguments = Telegram::CLIArguments.new(@config)
+      command = "'#{@config.daemon}' #{cli_arguments.to_s}"
       @stdout = IO.popen(command)
       loop do
         if t = @stdout.readline then
@@ -155,7 +158,7 @@ module Telegram
     end
 
     # Start telegram-cli daemon
-    # 
+    #
     # @yield This block will be executed when all connections have responded
     def connect(&block)
       logger.info("Trying to start telegram-cli and then connect")
