@@ -62,6 +62,7 @@ module Telegram
     def initialize(&block)
       @config = Telegram::Config.new
       yield @config
+      @logger = @config.logger if @config.logger
       @connected = 0
       @stdout = nil
       @connect_callback = nil
