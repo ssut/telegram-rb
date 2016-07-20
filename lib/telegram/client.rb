@@ -80,11 +80,7 @@ module Telegram
       cli_arguments = Telegram::CLIArguments.new(@config)
       command = "'#{@config.daemon}' #{cli_arguments.to_s}"
       @stdout = IO.popen(command)
-      loop do
-        if t = @stdout.readline then
-          break if t.include?('I: config')
-        end
-      end
+      @stdout.readline
       proc {}
     end
 

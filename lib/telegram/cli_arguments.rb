@@ -14,7 +14,8 @@ module Telegram
         udp_socket,
         json,
         disable_readline,
-        profile
+        profile,
+        config_file
       ].compact.join(' ')
     end
 
@@ -50,6 +51,10 @@ module Telegram
 
     def profile
       "-p #{@config.profile}" if @config.profile
+    end
+
+    def config_file
+      "-c #{@config.config_file}" if @config.config_file
     end
   end
 end
