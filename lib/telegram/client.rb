@@ -95,28 +95,14 @@ module Telegram
     #
     # @api private
     def poll
-      data = ''
       logger.info("Start polling for events")
-      loop do
+      while (data = @stdout.readline)
         begin
-          byte = @stdout.read_nonblock 1
-        rescue IO::WaitReadable
-          IO.select([@stdout])
-          retry
-        rescue EOFError
-          logger.error("EOFError occurred during the polling")
-          return
-        end
-        data << byte unless @starts_at.nil?
-        if byte.include?("\n")
-          begin
-            brace = data.index('{')
-            data = data[brace..-2]
-            data = Oj.load(data, mode: :compat)
-            @events << data
-          rescue
-          end
-          data = ''
+          brace = data.index('{')
+          data = data[brace..-2]
+          data = Oj.load(data, mode: :compat)
+          @events << data
+        rescue
         end
       end
     end

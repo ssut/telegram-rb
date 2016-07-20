@@ -13,6 +13,7 @@ module Telegram
         wait_dialog_list,
         udp_socket,
         json,
+        disable_readline,
         profile
       ].compact.join(' ')
     end
@@ -41,6 +42,10 @@ module Telegram
 
     def json
       '--json'
+    end
+
+    def disable_readline
+      '-R'
     end
 
     def profile

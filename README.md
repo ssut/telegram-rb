@@ -13,7 +13,7 @@ A Ruby wrapper that communicates with the [Telegram-CLI](https://github.com/vysh
 
 ### Requirements
 
-* You need to install the [Telegram-CLI](https://github.com/vysheng/tg) first.
+* You need to install the [Telegram-CLI](https://github.com/vysheng/tg) version 1.3.0 or higher first.
 
 ### RubyGems
 
