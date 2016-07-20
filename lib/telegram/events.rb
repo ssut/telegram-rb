@@ -123,7 +123,7 @@ module Telegram
     # @since [0.1.0]
     def initialize(client, event = EventType::UNKNOWN_EVENT, action = ActionType::NO_ACTION, data = {})
       @client = client
-      @id = data.try(:[], 'id') || ''
+      @id = data.respond_to?(:[]) ? data['id'] : ''
       @message = nil
       @tgmessage = nil
       @raw_data = data
@@ -163,7 +163,8 @@ module Telegram
 
       message.id = @id
       message.text = @raw_data['text'] ||= ''
-      message.type = @raw_data['media'].try(:[], 'type') || 'text'
+      media = @raw_data['media']
+      message.type = media ? media['type'] : 'text'
       message.raw_from = @raw_data['from']['peer_id']
       message.from_type = @raw_data['from']['peer_type']
       message.raw_to = @raw_data['to']['peer_id']
@@ -194,7 +195,7 @@ module Telegram
           if type == 'encr_chat' then
             @message.to = chat
           else
-            @message.from = chat 
+            @message.from = chat
           end
         when 'user'
           user = TelegramContact.pick_or_new(@client, @raw_data['to'])

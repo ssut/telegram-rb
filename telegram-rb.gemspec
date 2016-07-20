@@ -18,7 +18,6 @@ Gem::Specification.new do |s|
   s.add_dependency('eventmachine')
   s.add_dependency('em-synchrony')
   s.add_dependency('em-http-request')
-  s.add_dependency('activesupport')
   s.add_dependency('fastimage')
   s.add_dependency('oj')
 

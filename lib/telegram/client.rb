@@ -1,17 +1,12 @@
 # encoding: utf-8
 require 'eventmachine'
-require "em-synchrony"
+require 'em-synchrony'
 require 'em-synchrony/fiber_iterator'
 require 'em-http-request'
-require 'ostruct'
 require 'oj'
-require 'shellwords'
 require 'date'
 require 'tempfile'
 require 'fastimage'
-require 'active_support/core_ext/object/try'
-
-require 'ext/string'
 
 require 'telegram/config'
 require 'telegram/cli_arguments'
