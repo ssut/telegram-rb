@@ -50,6 +50,7 @@ EM.run do
     cfg.daemon = '/path/to/tg/bin/telegram-cli'
     cfg.key = '/path/to/tg/tg-server.pub'
     cfg.profile = 'user2' # optional, the profiles must be configured in ~/.telegram-cli/config
+    cfg.logger = Logger.new(STDOUT) # optional, default logger will be created if not set
   end
 
   telegram.connect do
