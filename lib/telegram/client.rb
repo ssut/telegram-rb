@@ -17,6 +17,7 @@ require 'telegram/callback'
 require 'telegram/api'
 require 'telegram/models'
 require 'telegram/events'
+require 'ext/string'
 
 module Telegram
   # Telegram Client
