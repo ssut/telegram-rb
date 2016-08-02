@@ -127,6 +127,16 @@ module Telegram
       @connection.communicate(['msg', target, text.escape!], &callback)
     end
 
+    # Mark as read all received messages with specific user
+    #
+    # @param [String] target Target to mark read messages
+    # @example
+    #   telegram.mark_read('user#1234567')
+    def mark_read(target)
+      assert!
+      @connection.communicate(['mark_read', target])
+    end
+
     # Add a user to the chat group
     #
     # @param [String] chat Target chat group to add a user
