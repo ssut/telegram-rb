@@ -8,10 +8,10 @@ module Telegram
   #   * phone_number: phone number which will be authorized
   #   * confirmation: proc which should return confirmation code received via
   #                   text message, or call
-  #   * register(optional): hash with two opetions
+  #   * register(optional): hash with two options
   #     - :first_name: user first name
-  #     - :last_name: user first name
-  class AuthProps
+  #     - :last_name: user last name
+  class AuthProperties
     extend Forwardable
 
     DEFAULT_OPTIONS = {

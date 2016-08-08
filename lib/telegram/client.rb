@@ -9,7 +9,7 @@ require 'tempfile'
 require 'fastimage'
 
 require 'telegram/config'
-require 'telegram/auth_props'
+require 'telegram/auth_properties'
 require 'telegram/authorization'
 require 'telegram/cli_arguments'
 require 'telegram/logger'
@@ -51,7 +51,7 @@ module Telegram
     #
     # @see EventType
     # @since [0.1.0]
-    attr_accessor :on, :auth_props
+    attr_accessor :on, :auth_properties
 
     # Initialize Telegram Client
     #
@@ -59,8 +59,8 @@ module Telegram
     # @yield [config] Given configuration struct to the block
     def initialize(&block)
       @config = Telegram::Config.new
-      @auth_props = Telegram::AuthProps.new
-      yield @config, @auth_props
+      @auth_properties = Telegram::AuthProperties.new
+      yield @config, @auth_properties
       @logger = @config.logger if @config.logger
       @connected = 0
       @stdout = nil
@@ -194,8 +194,8 @@ module Telegram
     private
 
     def initialize_stdout_reading
-      return Authorization.new(@stdout, @auth_props, @logger).perform if @auth_props.present?
-      @stdout.readline
+      return stdout.readline unless auth_properties.present?
+      Authorization.new(stdout, auth_properties, logger).perform
     end
   end
 end

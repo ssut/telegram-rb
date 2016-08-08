@@ -1,8 +1,8 @@
 module Telegram
   class Authorization
-    def initialize(std_in_out, auth_props, logger)
+    def initialize(std_in_out, properties, logger)
       @std_in_out = std_in_out
-      @auth_props = auth_props
+      @properties = properties
       @logger = logger
     end
 
@@ -32,7 +32,7 @@ module Telegram
         when /register \(Y\/n\):/
           stdout_log = ''
           handle_registration
-        when /"phone": "#{auth_props.phone_number}"/
+        when /"phone": "#{properties.phone_number}"/
           logger.info 'Authorization: successfully completed'
           return true
         else
@@ -45,14 +45,14 @@ module Telegram
 
     private
 
-    attr_accessor :std_in_out, :auth_props, :logger
+    attr_accessor :std_in_out, :properties, :logger
 
     def handle_phone_number
       raise 'Incorrect phone number' if @_phone_number_triggered
       @_phone_number_triggered = true
 
-      std_in_out.puts(auth_props.phone_number)
-      logger.info "Authorization: sent phone number (#{auth_props.phone_number})"
+      std_in_out.puts(properties.phone_number)
+      logger.info "Authorization: sent phone number (#{properties.phone_number})"
     end
 
     def handle_confirmation_code
@@ -60,20 +60,20 @@ module Telegram
       @_confirmation_triggered = true
 
       logger.info 'Authorization: retrieving confirmation code'
-      confirmation_code = auth_props.confirmation.call
+      confirmation_code = properties.confirmation.call
       std_in_out.puts(confirmation_code)
       logger.info "Authorization: sent confirmation code (#{confirmation_code})"
     end
 
     def handle_registration
-      raise 'Registration required' unless auth_props.register?
+      raise 'Registration required' unless properties.register?
       raise 'Incorrect first or last name' if @_registration_triggered
       @_registration_triggered = true
 
       std_in_out.puts('Y')
-      std_in_out.puts(auth_props.registration[:first_name])
-      std_in_out.puts(auth_props.registration[:last_name])
-      logger.info "Authorization: sent registration data (#{auth_props.registration.inspect})"
+      std_in_out.puts(properties.registration[:first_name])
+      std_in_out.puts(properties.registration[:last_name])
+      logger.info "Authorization: sent registration data (#{properties.registration.inspect})"
     end
   end
 
