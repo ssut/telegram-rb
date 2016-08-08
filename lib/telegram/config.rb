@@ -20,7 +20,8 @@ module Telegram
     }.freeze
 
     def_delegators :@options, :daemon, :daemon=, :key, :key=, :sock, :sock=,
-                   :size, :size=, :profile, :profile=, :logger, :logger=
+                   :size, :size=, :profile, :profile=, :logger, :logger=,
+                   :config_file, :config_file=
 
     def initialize(options = {})
       @options = OpenStruct.new(DEFAULT_OPTIONS.merge(options))
