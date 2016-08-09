@@ -46,12 +46,20 @@ Bundler.require(:default)
 # require 'telegram'
 
 EM.run do
-  telegram = Telegram::Client.new do |cfg|
+  telegram = Telegram::Client.new do |cfg, auth|
     cfg.daemon = '/path/to/tg/bin/telegram-cli'
     cfg.key = '/path/to/tg/tg-server.pub'
     cfg.config_file = '/path/to/config' # optional, default file will be used if not set
     cfg.profile = 'user2' # optional, the profiles must be configured in ~/.telegram-cli/config
     cfg.logger = Logger.new(STDOUT) # optional, default logger will be created if not set
+
+    # optional properties, could be used for authorization/registration telegram accounts
+    auth.phone_number = '<valid phone number>'
+    auth.confirmation_code = -> { '<received confirmation code via sms or call>' }
+    auth.register = { # required in case with registration new telegram account
+      first_name: '<user first name>',
+      last_name: '<user last name>'
+    }
   end
 
   telegram.connect do

@@ -9,6 +9,8 @@ require 'tempfile'
 require 'fastimage'
 
 require 'telegram/config'
+require 'telegram/auth_properties'
+require 'telegram/authorization'
 require 'telegram/cli_arguments'
 require 'telegram/logger'
 require 'telegram/connection'
@@ -49,7 +51,7 @@ module Telegram
     #
     # @see EventType
     # @since [0.1.0]
-    attr_accessor :on
+    attr_accessor :on, :auth_properties
 
     # Initialize Telegram Client
     #
@@ -57,7 +59,8 @@ module Telegram
     # @yield [config] Given configuration struct to the block
     def initialize(&block)
       @config = Telegram::Config.new
-      yield @config
+      @auth_properties = Telegram::AuthProperties.new
+      yield @config, @auth_properties
       @logger = @config.logger if @config.logger
       @connected = 0
       @stdout = nil
@@ -79,8 +82,8 @@ module Telegram
     def execute
       cli_arguments = Telegram::CLIArguments.new(@config)
       command = "'#{@config.daemon}' #{cli_arguments.to_s}"
-      @stdout = IO.popen(command)
-      @stdout.readline
+      @stdout = IO.popen(command, 'a+')
+      initialize_stdout_reading
       proc {}
     end
 
@@ -89,7 +92,7 @@ module Telegram
     # @api private
     def poll
       logger.info("Start polling for events")
-      while (data = @stdout.readline)
+      while (data = @stdout.gets)
         begin
           brace = data.index('{')
           data = data[brace..-2]
@@ -144,6 +147,9 @@ module Telegram
       @connect_callback = block
       process_data
       EM.defer(execute, create_pool)
+    rescue => e
+      logger.error("Failed establish connection with telegram-cli: #{e}")
+      Process.kill('INT', stdout.pid)
     end
 
     # Create a connection pool based on the {Connection} and given configuration
@@ -176,12 +182,20 @@ module Telegram
     # @api private
     def on_disconnect
       @connected -= 1
+      logger.info("Disconnected from Telegram CLI") if @connected == 0
     end
 
     # @return [bool] Connection pool status
     # @since [0.1.0]
     def connected?
       @connected == @config.size
+    end
+
+    private
+
+    def initialize_stdout_reading
+      return stdout.readline unless auth_properties.present?
+      Authorization.new(stdout, auth_properties, logger).perform
     end
   end
 end
