@@ -1,4 +1,5 @@
 require 'ostruct'
+require 'forwardable'
 
 module Telegram
   # Telegram client config
