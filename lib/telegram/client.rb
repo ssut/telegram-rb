@@ -84,7 +84,6 @@ module Telegram
       command = "'#{@config.daemon}' #{cli_arguments.to_s}"
       @stdout = IO.popen(command, 'a+')
       initialize_stdout_reading
-      proc {}
     end
 
     # Do the long-polling from stdout of the telegram-cli
@@ -146,23 +145,19 @@ module Telegram
       logger.info("Trying to start telegram-cli and then connect")
       @connect_callback = block
       process_data
-      EM.defer(execute, create_pool)
-    rescue => e
-      logger.error("Failed establish connection with telegram-cli: #{e}")
-      Process.kill('INT', stdout.pid)
+      EM.defer(method(:execute), method(:create_pool), method(:execution_failed))
     end
 
     # Create a connection pool based on the {Connection} and given configuration
     #
     # @api private
-    def create_pool
+    def create_pool(*)
       @connection = ConnectionPool.new(@config.size) do
         client = EM.connect_unix_domain(@config.sock, Connection)
         client.on_connect = self.method(:on_connect)
         client.on_disconnect = self.method(:on_disconnect)
         client
       end
-      proc {}
     end
 
     # A event listener that will be called if the {Connection} successes on either of {ConnectionPool}
@@ -182,7 +177,15 @@ module Telegram
     # @api private
     def on_disconnect
       @connected -= 1
-      logger.info("Disconnected from Telegram CLI") if @connected == 0
+      if @connected == 0
+        logger.info("Disconnected from Telegram CLI")
+        close_stdout
+        @disconnect_callback.call if @disconnect_callback
+      end
+    end
+
+    def on_disconnect=(callback)
+      @disconnect_callback = callback
     end
 
     # @return [bool] Connection pool status
@@ -192,6 +195,15 @@ module Telegram
     end
 
     private
+
+    def execution_failed(e)
+      logger.error("Failed execution of telegram-cli: #{e}")
+      close_stdout
+    end
+
+    def close_stdout
+      Process.kill('INT', stdout.pid)
+    end
 
     def initialize_stdout_reading
       return stdout.readline unless auth_properties.present?
