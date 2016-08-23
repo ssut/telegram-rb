@@ -87,6 +87,11 @@ EM.run do
     telegram.on[Telegram::EventType::SEND_MESSAGE] = Proc.new do |event|
       puts event
     end
+
+    # When connection is closed:
+    telegram.on_disconnect = Proc.new do
+      puts 'Connection with telegram-cli is closed'
+    end
   end
 end
 ```
