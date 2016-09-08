@@ -191,6 +191,19 @@ module Telegram
       @connection.communicate(['send_typing', chat], &callback)
     end
 
+    # Send contact to peer chat
+    #
+    # @param [String] peer Target chat to which contact will be send
+    # @param [String] contact phone number
+    # @param [String] contact first name
+    # @param [String] contact last name
+    # @example
+    #   telegram.send_contact('chat#1234567', '9329232332', 'Foo', 'Bar')
+    def send_contact(peer, phone, first_name, last_name)
+      assert!
+      @connection.communicate(['send_contact', peer, phone, first_name, last_name])
+    end
+
     # Abort sendign typing signal
     #
     # @param [String] chat Target chat group to stop sending typing signal
