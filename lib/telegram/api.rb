@@ -259,6 +259,24 @@ module Telegram
       @connection.communicate(['send_video', chat, path], &callback)
     end
 
+    # Send a file to the chat
+    #
+    # @param [String] chat Target chat group to send a file
+    # @param [String] path The path of the file you want to send
+    # @param [Block] callback Callback block that will be called when finished
+    # @yieldparam [Bool] success The result of the request (true or false)
+    # @yieldparam [Hash] data The raw data of the request
+    # @example
+    #   telegram.send_file('chat#1234567', file_path) do |success, data|
+    #     puts "there was a problem during the sending" unless success
+    #     puts success # => true
+    #     puts data # => {"event": "message", "media": {"type": "document", ...}, ...}
+    #   end
+    def send_file(chat, path, &callback)
+      assert!
+      @connection.communicate(['send_file', chat, path], &callback)
+    end
+
     def create_group_chat(chat_topic, *users, &callback)
       assert!
       members = users.join(" ")
