@@ -124,7 +124,7 @@ module Telegram
     #   end
     def msg(target, text, &callback)
       assert!
-      @connection.communicate(['msg', target, text.escape], &callback)
+      @connection.communicate(['msg', target, text], &callback)
     end
 
     # Mark as read all received messages with specific user
