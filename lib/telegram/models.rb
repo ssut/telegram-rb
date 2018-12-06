@@ -301,12 +301,17 @@ module Telegram
       @user = @sender = event.message.from
       @receiver = event.message.to
 
-      @target = case @receiver.type
-      when 'user'
-        @sender
-      when 'chat', 'encr_chat'
-        @receiver
-      end
+      @target =
+        begin
+          case @receiver.type
+            when 'user'
+              @sender
+            when 'chat', 'encr_chat'
+              @receiver
+            end
+        rescue NoMethodError
+          @sender
+        end
     end
 
     # @abstract Reply a message to the sender (peer to peer)
